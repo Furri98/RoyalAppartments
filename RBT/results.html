@@ -1,0 +1,386 @@
+﻿<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RBT Ranglisten</title>
+  <style>
+    * { box-sizing: border-box; }
+    :root {
+      --accent: #06b6d4; --accent-dark: #0891b2;
+      --ok: #22c55e; --warn: #f59e0b; --danger: #ef4444;
+      --bg: #0f172a; --panel: #111827; --panel-2: #1e293b;
+      --text: #e5e7eb; --muted: #94a3b8; --border: #334155;
+    }
+    html { overflow-y: scroll; }
+    body { margin: 0; padding: 20px; font-family: "Segoe UI", system-ui, sans-serif;
+      background: radial-gradient(circle at top, #1e293b, var(--bg) 60%);
+      color: var(--text); line-height: 1.5; min-height: 100vh; }
+    .wrap { max-width: 1200px; margin: 0 auto; }
+    .site-header { display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border);
+      gap: 12px; flex-wrap: wrap; }
+    .site-header h1 { margin: 0; font-size: 24px; font-weight: 700; }
+    .site-nav { display: flex; gap: 8px; flex-wrap: wrap; }
+    .site-nav a { background: var(--panel-2); color: var(--text); border: 1px solid var(--border);
+      padding: 7px 14px; border-radius: 8px; text-decoration: none;
+      font-size: 13px; font-weight: 500; transition: background 0.15s, border-color 0.15s; }
+    .site-nav a:hover, .site-nav a.active
+      { background: var(--accent); border-color: var(--accent); color: #001018; }
+
+    /* Race bar */
+    .race-bar { background: var(--panel-2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 12px 18px; display: flex; align-items: center;
+      gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+    .race-bar label { color: var(--muted); font-size: 13px; white-space: nowrap; }
+    .race-bar select { background: #0b1220; border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text); padding: 8px 12px; font-size: 14px;
+      flex: 1; min-width: 200px; max-width: 400px; }
+    .race-bar .refreshed { margin-left: auto; font-size: 12px; color: var(--muted); }
+
+    /* Tab bar */
+    .tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
+    .tab-btn { background: var(--panel-2); color: var(--muted); border: 1px solid var(--border);
+      padding: 8px 18px; border-radius: 8px; font-size: 14px; font-weight: 500;
+      cursor: pointer; transition: background 0.15s, color 0.15s; min-width: 0; }
+    .tab-btn:hover { background: var(--panel); color: var(--text); }
+    .tab-btn.active { background: var(--accent); border-color: var(--accent);
+      color: #001018; font-weight: 500; }
+
+    /* Panel */
+    .panel { background: linear-gradient(180deg, var(--panel), var(--panel-2));
+      border: 1px solid var(--border); border-radius: 12px; padding: 20px;
+      margin-bottom: 20px; }
+    .panel h2 { margin: 0 0 14px; font-size: 16px; font-weight: 600; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.05em; }
+
+    /* Ranking table */
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+    th { color: var(--muted); font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.04em; }
+    tr:hover td { background: rgba(6,182,212,0.04); }
+
+    /* Rank badge */
+    .rank { font-size: 18px; width: 32px; text-align: center; }
+    .rank-1 { color: #ca8a04; }
+    .rank-2 { color: #94a3b8; }
+    .rank-3 { color: #b45309; }
+    .rank-n { color: var(--muted); font-size: 13px; font-weight: 600; }
+
+    /* Time chip */
+    .time-chip { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--accent); }
+    .diff-chip { font-variant-numeric: tabular-nums; font-weight: 600; font-size: 12px; }
+    .diff-ok   { color: var(--ok); }
+    .diff-warn { color: var(--warn); }
+    .diff-late { color: var(--danger); }
+
+    /* Empty state */
+    .empty { color: var(--muted); font-size: 13px; padding: 16px 0; }
+
+    /* Tab panes */
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+
+    .footer-bar { text-align: center; color: var(--muted); font-size: 12px; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="site-header">
+      <h1>Ranglisten</h1>
+      <nav class="site-nav">
+        <a href="/">Zeitnahme</a>
+        <a href="/dashboard.html">Dashboard</a>
+        <a href="/races.html">Wettkaempfe</a>
+        <a href="/categories.html">Kategorien</a>
+        <a href="/participants.html">Teilnehmer</a>
+        <a href="/results.html" class="active">Ranglisten</a>
+      </nav>
+    </header>
+
+    <!-- Race selector -->
+    <div class="race-bar">
+      <label for="raceSelector">Wettkampf</label>
+      <select id="raceSelector">
+        <option value="">-- Wettkampf waehlen --</option>
+      </select>
+      <span class="refreshed" id="refreshed">-</span>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+<button class="tab-btn active" data-tab="mittelwert">&#127942; Naechste zum Mittelwert</button>
+<button class="tab-btn" data-tab="maenner">&#9794; M&auml;nner (M)</button>
+<button class="tab-btn" data-tab="frauen">&#9792; Frauen (F)</button>
+<button class="tab-btn" data-tab="tandem">&#128101; Tandem (T)</button>
+    </div>
+
+    <div class="tab-pane active" id="tab-mittelwert">
+      <div class="panel">
+<h2>&#127942; Naechste zum Mittelwert &mdash; alle Finisher</h2>
+        <p id="mittelwertInfo" style="font-size:13px;color:var(--muted);margin:0 0 12px;"></p>
+        <table>
+          <thead><tr>
+            <th style="width:40px;"></th>
+            <th>Name</th>
+            <th>Kategorie</th>
+            <th>Geschlecht</th>
+            <th>Verein</th>
+            <th>Zeit (Ist)</th>
+            <th>Zeit (Soll)</th>
+            <th>Abstand</th>
+          </tr></thead>
+          <tbody id="body-mittelwert"><tr><td colspan="8" class="empty">Keine Daten</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tab: Maenner -->
+    <div class="tab-pane" id="tab-maenner">
+      <div class="panel">
+<h2>&#9794; Schnellste M&auml;nner &mdash; nach absoluter Zielzeit</h2>
+        <table>
+          <thead><tr>
+            <th style="width:40px;"></th>
+            <th>Name</th>
+            <th>Kategorie</th>
+            <th>Verein</th>
+            <th>Zielzeit (Uhr)</th>
+            <th>Zeit (Ist)</th>
+          </tr></thead>
+          <tbody id="body-maenner"><tr><td colspan="6" class="empty">Keine Daten</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tab: Frauen -->
+    <div class="tab-pane" id="tab-frauen">
+      <div class="panel">
+<h2>&#9792; Schnellste Frauen &mdash; nach absoluter Zielzeit</h2>
+        <table>
+          <thead><tr>
+            <th style="width:40px;"></th>
+            <th>Name</th>
+            <th>Kategorie</th>
+            <th>Verein</th>
+            <th>Zielzeit (Uhr)</th>
+            <th>Zeit (Ist)</th>
+          </tr></thead>
+          <tbody id="body-frauen"><tr><td colspan="6" class="empty">Keine Daten</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tab: Tandem -->
+    <div class="tab-pane" id="tab-tandem">
+      <div class="panel">
+<h2>&#128101; Schnellste Tandems &mdash; nach absoluter Zielzeit</h2>
+        <table>
+          <thead><tr>
+            <th style="width:40px;"></th>
+            <th>Name</th>
+            <th>Kategorie</th>
+            <th>Verein</th>
+            <th>Zielzeit (Uhr)</th>
+            <th>Zeit (Ist)</th>
+          </tr></thead>
+          <tbody id="body-tandem"><tr><td colspan="6" class="empty">Keine Daten</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="footer-bar" id="footerBar">Wird geladen...</div>
+  </div>
+
+  <script>
+    const apiBase = "";
+    const SELECTED_RACE_KEY = "rbt.selectedRaceId";
+    let selectedRaceId = null;
+    let participantsDetail = [];
+
+    /* ?? helpers ??????????????????????????????????????????????? */
+    function getStoredRaceId() {
+      const raw = localStorage.getItem(SELECTED_RACE_KEY);
+      const parsed = Number(raw);
+      return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+    }
+    function storeRaceId(id) {
+      if (!id) localStorage.removeItem(SELECTED_RACE_KEY);
+      else localStorage.setItem(SELECTED_RACE_KEY, String(id));
+    }
+
+    function fmt(totalSeconds) {
+      if (totalSeconds == null) return "-";
+      const neg = totalSeconds < 0;
+      const abs = Math.abs(totalSeconds);
+      const h = Math.floor(abs / 3600);
+      const m = Math.floor((abs % 3600) / 60);
+      const s = abs % 60;
+      return (neg ? "-" : "") +
+        `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+    }
+
+    function fmtTime(iso) {
+      if (!iso) return "-";
+      return new Intl.DateTimeFormat("de-DE", {
+        timeZone: "Europe/Berlin",
+        hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false
+      }).format(new Date(iso));
+    }
+
+    function rankIcon(i) {
+      if (i === 0) return '<span class="rank rank-1">\uD83E\uDD47</span>';
+      if (i === 1) return '<span class="rank rank-2">\uD83E\uDD48</span>';
+      if (i === 2) return '<span class="rank rank-3">\uD83E\uDD49</span>';
+      return `<span class="rank rank-n">${i + 1}.</span>`;
+    }
+
+    function diffClass(dev) {
+      if (dev == null) return "";
+      if (Math.abs(dev) <= 15) return "diff-ok";
+      if (Math.abs(dev) <= 60) return "diff-warn";
+      return "diff-late";
+    }
+
+    function genderLabel(g) {
+      if (g === "M") return "\u2642 M";
+      if (g === "F") return "\u2640 F";
+      if (g === "T") return "\uD83D\uDC65 T";
+      return "-";
+    }
+
+    /* ?? tabs ?????????????????????????????????????????????????? */
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        document.querySelectorAll(".tab-pane").forEach(p => p.classList.remove("active"));
+        btn.classList.add("active");
+        document.getElementById(`tab-${btn.dataset.tab}`).classList.add("active");
+      });
+    });
+
+    /* ?? races ????????????????????????????????????????????????? */
+    async function loadRaces() {
+      const res = await fetch(`${apiBase}/api/races`);
+      const races = await res.json();
+      const sel = document.getElementById("raceSelector");
+      sel.innerHTML = '<option value="">-- Wettkampf waehlen --</option>';
+      for (const r of races) {
+        const opt = document.createElement("option");
+        opt.value = r.id;
+        const label = r.startzeit ? fmtTime(r.startzeit) : (r.datum?.slice(0,10) ?? "-");
+        opt.textContent = `${r.name} (${label})`;
+        sel.appendChild(opt);
+      }
+      const preferred = selectedRaceId ?? getStoredRaceId();
+      const found = races.find(r => Number(r.id) === Number(preferred));
+      if (found) {
+        selectedRaceId = Number(found.id);
+        sel.value = String(found.id);
+        storeRaceId(selectedRaceId);
+        await refresh();
+      } else if (races.length > 0) {
+        selectedRaceId = Number(races[0].id);
+        sel.value = String(selectedRaceId);
+        storeRaceId(selectedRaceId);
+        await refresh();
+      }
+    }
+
+    document.getElementById("raceSelector").addEventListener("change", async (e) => {
+      selectedRaceId = Number(e.target.value) || null;
+      storeRaceId(selectedRaceId);
+      if (selectedRaceId) await refresh();
+    });
+
+    /* ?? data load ????????????????????????????????????????????? */
+    async function refresh() {
+      if (!selectedRaceId) return;
+      try {
+        const [liveRes, partRes] = await Promise.all([
+          fetch(`${apiBase}/api/participants/live-overview?wettkampfId=${selectedRaceId}`),
+          fetch(`${apiBase}/api/participants`)
+        ]);
+        if (!liveRes.ok) throw new Error("Live-Daten konnten nicht geladen werden");
+        const live = await liveRes.json();
+        const allParts = partRes.ok ? await partRes.json() : [];
+        participantsDetail = allParts.filter(p => Number(p.wettkampfId) === selectedRaceId);
+        render(live);
+      } catch (e) {
+        document.getElementById("footerBar").textContent = `Fehler: ${e.message}`;
+      }
+    }
+
+    /* ?? render ???????????????????????????????????????????????? */
+    function render(d) {
+      const rows = d.rows ?? [];
+      const detailMap = new Map(participantsDetail.map(p => [Number(p.id), p]));
+
+      // Only finished participants with elapsed time
+      const finished = rows
+        .filter(r => r.participantStatus === "FINISH" && r.finishElapsedSeconds != null)
+        .map(r => ({ ...r, detail: detailMap.get(Number(r.participantId)) ?? {} }));
+
+      /* ?? Mittelwert-Rangliste ??????????????????????? */
+      const avg = d.averageTargetSeconds;
+      document.getElementById("mittelwertInfo").textContent = avg != null
+        ? `Mittelwert Soll: ${fmt(avg)} \u2014 Sortiert nach kleinstem absolutem Abstand zum Mittelwert`
+        : "Noch keine Zielzeiten vorhanden.";
+
+      const byMittelwert = [...finished]
+        .filter(r => r.deviationFromTargetSeconds != null)
+        .sort((a, b) => Math.abs(a.deviationFromTargetSeconds) - Math.abs(b.deviationFromTargetSeconds));
+
+      document.getElementById("body-mittelwert").innerHTML = byMittelwert.length === 0
+        ? '<tr><td colspan="8" class="empty">Noch keine Finisher</td></tr>'
+        : byMittelwert.map((r, i) => {
+            const dev = r.deviationFromTargetSeconds;
+            const diffTxt = dev == null ? "-" : (dev >= 0 ? "+" : "") + fmt(dev);
+            return `<tr>
+              <td>${rankIcon(i)}</td>
+              <td style="font-weight:600;">${r.name}</td>
+              <td style="color:var(--muted);">${r.category}</td>
+              <td>${genderLabel(r.detail?.geschlecht)}</td>
+              <td style="color:var(--muted);">${r.detail?.verein ?? "-"}</td>
+              <td class="time-chip">${fmt(r.finishElapsedSeconds)}</td>
+              <td class="time-chip" style="color:var(--muted);">${fmt(r.predictedDurationSeconds)}</td>
+              <td class="diff-chip ${diffClass(dev)}">${diffTxt}</td>
+            </tr>`;
+          }).join("");
+
+      /* ?? Geschlecht-Ranglisten ?????????????????????? */
+      renderGenderList("maenner", "M", finished);
+      renderGenderList("frauen",  "F", finished);
+      renderGenderList("tandem",  "T", finished);
+
+      document.getElementById("refreshed").textContent =
+        `Aktualisiert: ${fmtTime(d.generatedAt)}`;
+      document.getElementById("footerBar").textContent =
+        `${finished.length} Finisher \u2014 ${rows.length} Teilnehmer gesamt`;
+    }
+
+    function renderGenderList(bodyId, genderKey, finished) {
+      const subset = finished
+        .filter(r => r.detail?.geschlecht === genderKey)
+        .sort((a, b) => a.finishElapsedSeconds - b.finishElapsedSeconds);
+
+      document.getElementById(`body-${bodyId}`).innerHTML = subset.length === 0
+        ? `<tr><td colspan="6" class="empty">Noch keine Finisher in dieser Gruppe</td></tr>`
+        : subset.map((r, i) => `
+            <tr>
+              <td>${rankIcon(i)}</td>
+              <td style="font-weight:600;">${r.name}</td>
+              <td style="color:var(--muted);">${r.category}</td>
+              <td style="color:var(--muted);">${r.detail?.verein ?? "-"}</td>
+              <td class="time-chip" style="color:var(--muted);font-size:12px;">${fmtTime(r.latestEventTime)}</td>
+              <td class="time-chip">${fmt(r.finishElapsedSeconds)}</td>
+            </tr>`).join("");
+    }
+
+    /* ?? init ?????????????????????????????????????????????????? */
+    loadRaces();
+    setInterval(refresh, 15000);
+  </script>
+</body>
+</html>

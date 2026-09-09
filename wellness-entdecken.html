@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wellness entdecken</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="menu-toggle" id="menuToggle">
+                    <svg class="hamburger" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                    <span class="menu-text">Menu</span>
+                </div>
+                <nav class="nav" id="mainNav">
+                    <ul class="nav-list">
+                        <li><a href="wohnung-mieten.html" class="nav-link">Wohnung mieten</a></li>
+                        <li><a href="haus-royal.html" class="nav-link">Haus Royal</a></li>
+                        <li><a href="wellness-entdecken.html" class="nav-link">Wellness entdecken</a></li>
+                        <li><a href="https://www.aletscharena.ch/" class="nav-link" target="_blank">Aletsch Arena entdecken</a></li>
+                        <li><a href="kontakt.html" class="nav-link">Kontakt</a></li>
+                        <li class="lang-toggle-nav-item">
+                            <div class="lang-toggle-module">
+                                <button class="lang-toggle" id="langToggle" aria-label="Sprache wechseln">
+                                    <span class="lang-toggle-option lang-toggle-de active">DE</span>
+                                    <span class="lang-toggle-slider"></span>
+                                    <span class="lang-toggle-option lang-toggle-en">EN</span>
+                                </button>
+                            </div>
+                        </li>
+                    </ul>
+                </nav>
+                <div class="logo">
+                    <a href="index.html"><img src="img/logo.png" alt="Logo" class="logo-image" /></a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="page-hero">
+            <div class="container">
+                <h1>Wellness entdecken</h1>
+                <p class="lead">Entspannung und Erholung für Körper und Geist</p>
+            </div>
+        </section>
+
+        <!-- Collage Bildergalerie -->
+        <section class="wellness-collage-section">
+            <div class="container">
+                <div class="wellness-collage">
+                    <div class="collage-item collage-item-large" id="mainCollageImage">
+                        <img src="img/02_Winter/09_Wellness/IMG_9357.jpeg" alt="Wellness 1" id="largeWellnessImg" />
+                    </div>
+                    <div class="collage-item">
+                        <img src="img/02_Winter/09_Wellness/IMG_9358.jpeg" alt="Wellness 2" class="wellness-thumb" />
+                    </div>
+                    <div class="collage-item">
+                        <img src="img/02_Winter/09_Wellness/IMG_9362.jpeg" alt="Wellness 3" class="wellness-thumb" />
+                    </div>
+                    <div class="collage-item">
+                        <img src="img/02_Winter/09_Wellness/IMG_9366.jpeg" alt="Wellness 4" class="wellness-thumb" />
+                    </div>
+                    <div class="collage-item">
+                        <img src="img/02_Winter/09_Wellness/IMG_9365.jpeg" alt="Wellness 5" class="wellness-thumb" />
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+        <script>
+        // Swap images: clicking a thumbnail swaps it with the large image
+        document.addEventListener('DOMContentLoaded', function() {
+            const thumbs = document.querySelectorAll('.wellness-thumb');
+            const largeImg = document.getElementById('largeWellnessImg');
+            thumbs.forEach(thumb => {
+                thumb.style.cursor = 'pointer';
+                thumb.addEventListener('click', function() {
+                    // Swap src and alt between large and clicked thumb
+                    const tempSrc = largeImg.src;
+                    const tempAlt = largeImg.alt;
+                    largeImg.src = this.src;
+                    largeImg.alt = this.alt;
+                    this.src = tempSrc;
+                    this.alt = tempAlt;
+                });
+            });
+        });
+        </script>
+
+
+    <!-- Step by Step Anleitung Wellness -->
+    <section class="wellness-steps-section">
+        <div class="container">
+            <h2>Wellness Step-by-Step Anleitung</h2>
+            <ol class="wellness-steps-list">
+                <li>
+                    <strong>Schritt 1:</strong> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero.
+                </li>
+                <li>
+                    <strong>Schritt 2:</strong> Sed cursus ante dapibus diam. Sed nisi. Nulla quis sem at nibh elementum imperdiet.
+                </li>
+                <li>
+                    <strong>Schritt 3:</strong> Duis sagittis ipsum. Praesent mauris. Fusce nec tellus sed augue semper porta.
+                </li>
+                <li>
+                    <strong>Schritt 4:</strong> Mauris massa. Vestibulum lacinia arcu eget nulla. Class aptent taciti sociosqu ad litora.
+                </li>
+                <li>
+                    <strong>Schritt 5:</strong> Curabitur sodales ligula in libero. Sed dignissim lacinia nunc. Curabitur tortor.
+                </li>
+            </ol>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 Chanti Webseite. Alle Rechte vorbehalten.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

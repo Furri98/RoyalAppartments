@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meine Webseite</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="menu-toggle" id="menuToggle">
+                    <svg class="hamburger" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                    <span class="menu-text">Menu</span>
+                </div>
+                <nav class="nav" id="mainNav">
+                    <ul class="nav-list">
+                        <li><a href="wohnung-mieten.html" class="nav-link">Wohnung mieten</a></li>
+                        <li><a href="haus-royal.html" class="nav-link">Haus Royal</a></li>
+                        <li><a href="wellness-entdecken.html" class="nav-link">Wellness entdecken</a></li>
+                        <li><a href="https://www.aletscharena.ch/" class="nav-link" target="_blank">Aletsch Arena entdecken</a></li>
+                        <li><a href="kontakt.html" class="nav-link">Kontakt</a></li>
+                        <li class="lang-toggle-nav-item">
+                            <div class="lang-toggle-module">
+                                <button class="lang-toggle" id="langToggle" aria-label="Sprache wechseln">
+                                    <span class="lang-toggle-option lang-toggle-de active">DE</span>
+                                    <span class="lang-toggle-slider"></span>
+                                    <span class="lang-toggle-option lang-toggle-en">EN</span>
+                                </button>
+                            </div>
+                        </li>
+                    </ul>
+                </nav>
+                <div class="logo">
+                    <img src="img/logo.png" alt="Logo" class="logo-image" />
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero" id="heroSlider">
+            <div class="hero-slider-container">
+                <div class="hero-slide active">
+                    <img src="img/02_Winter/01_Wohnzimmer/IMG_1255.jpg" alt="Hero Image 1" class="hero-slide-img" />
+                </div>
+                <div class="hero-slide">
+                    <img src="img/02_Winter/03_Balkon/IMG_1611.JPEG" alt="Hero Image 2" class="hero-slide-img" />
+                </div>
+                <div class="hero-slide">
+                    <img src="img/02_Winter/05_Schalfzimmer1/IMG_1258.jpg" alt="Hero Image 3" class="hero-slide-img" />
+                </div>
+            </div>
+            <div class="hero-overlay">
+            </div>
+        </section>
+
+        <!-- Wellness Bild auf der Startseite -->
+                <div class="container">
+                    <div class="hero-content">
+                        <h1>Willkommen auf meiner Webseite</h1>
+                        <p class="lead">Entdecke eine neue Welt voller Möglichkeiten und Inspiration</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="hero-slider-controls">
+                <button class="slider-dot active" data-slide="0"></button>
+                <button class="slider-dot" data-slide="1"></button>
+                <button class="slider-dot" data-slide="2"></button>
+            </div>
+        </section>
+        <!-- Teaser Modul: Bild + Titel -->
+        <section class="teaser-module teaser-simple">
+            <div class="container teaser-simple-grid">
+                <a href="wohnung-mieten.html" class="teaser-thumb">
+                    <div class="teaser-thumb-text">
+                        <h2 class="teaser-thumb-title">Wohnung</h2>
+                        <p class="teaser-thumb-desc">Ferienwohnung pur</p>
+                    </div>
+                    <img src="img/02_Winter/01_Wohnzimmer/IMG_1616.JPEG" alt="Wohnung entdecken" class="teaser-thumb-img" />
+                </a>
+                <a href="wellness-entdecken.html" class="teaser-thumb">
+                    <div class="teaser-thumb-text">
+                        <h2 class="teaser-thumb-title">Wellness</h2>
+                        <p class="teaser-thumb-desc">Entspannung pur</p>
+                    </div>
+                    <img src="img/02_Winter/09_Wellness/IMG_9357.jpeg" alt="Wellness entdecken" class="teaser-thumb-img" />
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <div class="cta-floating">
+        <button class="btn btn-primary">Buchungsanfrage senden</button>
+    </div>
+
+    <footer>
+        <!-- Footer kommt hier hin -->
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

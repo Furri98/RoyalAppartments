@@ -1,0 +1,470 @@
+﻿<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RBT App Live</title>
+    <style>
+      * { box-sizing: border-box; }
+      :root {
+        --accent: #06b6d4; --accent-dark: #0891b2;
+        --ok: #22c55e; --warn: #f59e0b; --danger: #ef4444; --success: #10b981;
+        --bg: #0f172a; --panel: #111827; --panel-2: #1f2937;
+        --text: #e5e7eb; --muted: #94a3b8; --border: #334155;
+      }
+      * { box-sizing: border-box; }
+      body { margin: 0; padding: 20px; font-family: "Segoe UI", system-ui, sans-serif;
+        background: radial-gradient(circle at top, #1e293b, var(--bg) 55%);
+        color: var(--text); line-height: 1.5; min-height: 100vh; }
+      .wrap { max-width: 1200px; margin: 0 auto; }
+      .site-header { display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border);
+        gap: 12px; flex-wrap: wrap; }
+      .site-header h1 { margin: 0; font-size: 24px; font-weight: 700; }
+      .site-nav { display: flex; gap: 8px; flex-wrap: wrap; }
+      .site-nav a { background: var(--panel-2); color: var(--text); border: 1px solid var(--border);
+        padding: 7px 14px; border-radius: 8px; text-decoration: none;
+        font-size: 13px; font-weight: 600; transition: background 0.15s, border-color 0.15s; }
+      .site-nav a:hover, .site-nav a.active
+        { background: var(--accent); border-color: var(--accent); color: #001018; }
+      .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 16px; margin-bottom: 16px; }
+      .card { background: linear-gradient(180deg, var(--panel), var(--panel-2));
+        border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+      .card h2 { margin: 0 0 12px; font-size: 16px; font-weight: 600; }
+      .card h3 { margin: 0 0 10px; font-size: 15px; font-weight: 600; }
+      label { display: block; margin-bottom: 6px; color: var(--muted); font-size: 13px; }
+      input, select, button { width: 100%; border-radius: 8px; border: 1px solid var(--border);
+        background: #0b1220; color: var(--text); padding: 9px 12px; font-size: 14px; font-family: inherit; }
+      input:focus, select:focus { outline: none; border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(6,182,212,0.15); }
+      button { background: var(--accent); color: #001018; font-weight: 600;
+        cursor: pointer; border: none; transition: background 0.15s; }
+      button:hover { background: var(--accent-dark); }
+      table { width: 100%; border-collapse: collapse; background: var(--panel);
+        border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+      th, td { padding: 10px 12px; border-bottom: 1px solid var(--panel-2); text-align: left; font-size: 13px; }
+      th { color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; }
+      tr:hover td { background: rgba(6,182,212,0.04); }
+      .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+      .status { margin-top: 10px; color: var(--muted); font-size: 13px; }
+      h2 { margin: 16px 0 10px; font-size: 18px; }
+      .tag { font-weight: 700; }
+      .GOAL { color: var(--accent); }
+      .RACE { color: var(--ok); }
+      @media (max-width: 700px) { .row { grid-template-columns: 1fr; } }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="site-header">
+        <h1>RBT Zeitnahme</h1>
+        <nav class="site-nav">
+          <a href="/" class="active">Zeitnahme</a>
+          <a href="/dashboard.html">Dashboard</a>
+          <a href="/results.html">Ranglisten</a>
+          <a href="/races.html">Wettkaempfe</a>
+          <a href="/categories.html">Kategorien</a>
+          <a href="/participants.html">Teilnehmer</a>
+        </nav>
+      </header>
+
+      <div style="background: linear-gradient(180deg, var(--panel), var(--panel-2)); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-bottom: 16px;">
+        <label for="raceSelector" style="color: var(--muted); display: block; margin-bottom: 8px; font-size: 14px;">Aktueller Wettkampf</label>
+        <select id="raceSelector" style="width: 100%; max-width: 400px; border-radius: 10px; border: 1px solid #334155; background: #0b1220; color: var(--text); padding: 10px;">
+          <option value="">-- Wettkampf waehlen --</option>
+        </select>
+      </div>
+
+      <div class="cards">
+        <div class="card">
+          <h3>Zielzeit erfassen</h3>
+          <div class="row">
+            <div>
+              <label for="finishParticipantSearch">Fahrer (Name)</label>
+              <input id="finishParticipantSearch" type="text" placeholder="z.B. 'Max'" />
+              <div id="finishSuggestions" style="background: var(--panel-2); border: 1px solid #334155; border-radius: 8px; max-height: 200px; overflow-y: auto; margin-top: 4px; display: none;"></div>
+            </div>
+            <div>
+              <label for="recordedBy">Erfasst von</label>
+              <input id="recordedBy" type="text" value="operator" />
+            </div>
+          </div>
+          <button id="saveEvent" style="margin-top:12px;">FINISH speichern</button>
+          <div class="status" id="saveStatus"></div>
+        </div>
+
+        <div class="card">
+          <h3>Steuerung</h3>
+          <button id="refreshOverview" style="margin-top:0px;">Live neu laden</button>
+          <div class="status" id="overviewStatus">Bereit</div>
+        </div>
+      </div>
+
+      <h2>Live Zeitstatus (mit globaler Startzeit)</h2>
+      <div class="status" id="liveClock" style="margin-bottom: 10px; font-size: 14px; color: var(--text);">Aktuelle Zeit: -</div>
+      <div class="status" id="averageClock" style="margin-bottom: 10px; font-size: 14px; color: var(--text);">Mittelzeit des Wettkampfs: -</div>
+      <div class="status" id="closestClock" style="margin-bottom: 10px; font-size: 14px; color: var(--text);">Naechste zur Mittelzeit: -</div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Kategorie</th>
+              <th>Zielzeit (Ist)</th>
+              <th>Zielzeit (Soll)</th>
+              <th>Ist Dauer</th>
+              <th>Soll Dauer</th>
+              <th>Abstand Ist/Soll</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="overviewBody"></tbody>
+      </table>
+    </div>
+
+    <script>
+      const apiBase = "";
+      const SELECTED_RACE_KEY = "rbt.selectedRaceId";
+      let categoriesCache = [];
+      let racesCache = [];
+      let overviewRowsCache = [];
+      let selectedFinishParticipant = null;
+      let selectedRaceId = null;
+
+      function getStoredRaceId() {
+        const raw = localStorage.getItem(SELECTED_RACE_KEY);
+        const parsed = Number(raw);
+        return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+      }
+
+      function storeRaceId(raceId) {
+        if (!raceId) {
+          localStorage.removeItem(SELECTED_RACE_KEY);
+          return;
+        }
+        localStorage.setItem(SELECTED_RACE_KEY, String(raceId));
+      }
+
+      function formatDuration(totalSeconds) {
+        const isNegative = totalSeconds < 0;
+        const absSeconds = Math.abs(totalSeconds);
+        const hours = Math.floor(absSeconds / 3600);
+        const minutes = Math.floor((absSeconds % 3600) / 60);
+        const seconds = absSeconds % 60;
+        return `${isNegative ? "-" : ""}${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+      }
+
+      function formatClockTime(value) {
+        const date = value instanceof Date ? value : new Date(value);
+        if (Number.isNaN(date.getTime())) {
+          return "-";
+        }
+        return new Intl.DateTimeFormat("de-DE", {
+          timeZone: "Europe/Berlin",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: false
+        }).format(date);
+      }
+
+      function updateLiveClock() {
+        document.getElementById("liveClock").textContent = `Aktuelle Zeit: ${formatClockTime(new Date())}`;
+      }
+
+      function isRaceParticipant(row) {
+        return row.participantStatus === "AKTIV";
+      }
+
+      async function loadCategories() {
+        if (!selectedRaceId) return;
+        const res = await fetch(`${apiBase}/api/categories`);
+        if (!res.ok) throw new Error("Kategorien konnten nicht geladen werden");
+        const categories = await res.json();
+        // Filter categories by selected race
+        categoriesCache = categories.filter((c) => Number(c.wettkampfId) === selectedRaceId);
+      }
+
+      // Note: Race settings are now managed in /categories.html
+
+      async function loadRaces() {
+        try {
+          const res = await fetch(`${apiBase}/api/races`);
+          if (!res.ok) throw new Error("Wettkaempfe konnten nicht geladen werden");
+          racesCache = await res.json();
+          
+          const selector = document.getElementById("raceSelector");
+          selector.innerHTML = '<option value="">-- Wettkampf waehlen --</option>';
+          
+          for (const race of racesCache) {
+            const option = document.createElement("option");
+            option.value = race.id;
+            const date = new Date(race.datum).toLocaleDateString("de-DE");
+            option.textContent = `${race.name} (${date})`;
+            selector.appendChild(option);
+          }
+
+          const preferredRaceId = selectedRaceId ?? getStoredRaceId();
+          const preferredRace = racesCache.find((race) => Number(race.id) === Number(preferredRaceId));
+
+          if (preferredRace) {
+            selectedRaceId = Number(preferredRace.id);
+            selector.value = String(preferredRace.id);
+            storeRaceId(selectedRaceId);
+            await loadData();
+          } else if (racesCache.length > 0) {
+            selectedRaceId = Number(racesCache[0].id);
+            selector.value = String(selectedRaceId);
+            storeRaceId(selectedRaceId);
+            await loadData();
+          }
+        } catch (error) {
+          console.error("Error loading races:", error);
+        }
+      }
+
+      document.getElementById("raceSelector").addEventListener("change", (event) => {
+        selectedRaceId = Number(event.target.value) || null;
+        if (selectedRaceId) {
+          storeRaceId(selectedRaceId);
+          loadData();
+        } else {
+          storeRaceId(null);
+        }
+      });
+
+      async function loadData() {
+        try {
+          await loadCategories();
+          await loadOverview();
+        } catch (error) {
+          console.error("Error loading data:", error);
+        }
+      }
+
+      function filterFinishParticipants(query) {
+        if (!query.trim()) return [];
+        const lowerQuery = query.toLowerCase();
+        return overviewRowsCache.filter(
+          (row) =>
+            isRaceParticipant(row) &&
+            row.name.toLowerCase().includes(lowerQuery)
+        );
+      }
+
+      function renderFinishSuggestions(matches) {
+        const container = document.getElementById("finishSuggestions");
+        container.innerHTML = "";
+        if (matches.length === 0) {
+          container.innerHTML = '<div style="padding:8px;color:var(--muted);">Keine RACE-Teilnehmer verfuegbar</div>';
+          container.style.display = "block";
+          return;
+        }
+        for (const match of matches.slice(0, 10)) {
+            const item = document.createElement("div");
+            item.style.cssText = "padding:8px;cursor:pointer;border-bottom:1px solid #1f2937;";
+            item.textContent = `${match.name} - RACE`;
+            item.addEventListener("click", () => {
+              selectedFinishParticipant = {
+                id: match.participantId,
+                name: match.name
+              };
+              document.getElementById("finishParticipantSearch").value = match.name;
+              container.style.display = "none";
+            });
+            container.appendChild(item);
+        }
+        container.style.display = "block";
+      }
+
+      document.getElementById("finishParticipantSearch").addEventListener("input", (event) => {
+        const matches = filterFinishParticipants(event.target.value);
+        renderFinishSuggestions(matches);
+      });
+
+      async function loadOverview() {
+        const wettkampfId = selectedRaceId;
+        if (!wettkampfId) return;
+        const statusEl = document.getElementById("overviewStatus");
+        statusEl.textContent = "Lade...";
+
+        try {
+          const res = await fetch(`${apiBase}/api/participants/live-overview?wettkampfId=${encodeURIComponent(wettkampfId)}`);
+          if (!res.ok) throw new Error("Live-Uebersicht konnte nicht geladen werden");
+          const data = await res.json();
+          overviewRowsCache = data.rows;
+          if (
+            selectedFinishParticipant &&
+            !isRaceParticipant(overviewRowsCache.find((row) => row.participantId === selectedFinishParticipant.id))
+          ) {
+            selectedFinishParticipant = null;
+            document.getElementById("finishParticipantSearch").value = "";
+          }
+          const averageClock = document.getElementById("averageClock");
+          const closestClock = document.getElementById("closestClock");
+          averageClock.textContent = `Mittelwert Soll (Ist-Zeit * Faktor): ${data.averageTargetSeconds == null ? "-" : formatDuration(data.averageTargetSeconds)}`;
+          closestClock.textContent = data.closestToAverage
+            ? `Sieger (naechste zur Soll-Mitte): ${data.closestToAverage.name} (${formatDuration(data.closestToAverage.distanceSeconds)})`
+            : "Sieger (naechste zur Soll-Mitte): -";
+          const body = document.getElementById("overviewBody");
+          body.innerHTML = "";
+
+          const sortedRows = [...data.rows].sort((a, b) => {
+            const aVal = a.deviationFromTargetSeconds;
+            const bVal = b.deviationFromTargetSeconds;
+            // Rows without deviation (no finish yet) go to the end
+            if (aVal == null && bVal == null) return 0;
+            if (aVal == null) return 1;
+            if (bVal == null) return -1;
+            // Sort by absolute distance to 0 ascending (closest to target first)
+            return Math.abs(aVal) - Math.abs(bVal);
+          });
+
+          // Find the most recently added FINISH entry to highlight it
+          const finishedWithTime = data.rows.filter(
+            (r) => r.participantStatus === "FINISH" && r.latestEventTime
+          );
+          const lastAddedId = finishedWithTime.length > 0
+            ? finishedWithTime.reduce((best, r) =>
+                new Date(r.latestEventTime) > new Date(best.latestEventTime) ? r : best
+              ).participantId
+            : null;
+
+          for (const row of sortedRows) {
+            const tr = document.createElement("tr");
+              const isGoal = row.participantStatus === "FINISH";
+              const actualTimeText = isGoal && row.latestEventTime
+              ? formatClockTime(row.latestEventTime)
+              : "-";
+              const sollTimeText = row.predictedFinishAt
+                ? formatClockTime(row.predictedFinishAt)
+                : "-";
+              const istDurationText = row.finishElapsedSeconds == null
+                ? "-"
+                : formatDuration(row.finishElapsedSeconds);
+              const sollDurationText = row.predictedDurationSeconds == null
+                ? "-"
+                : formatDuration(row.predictedDurationSeconds);
+              const abstandText = row.deviationFromTargetSeconds == null
+                ? "-"
+                : (row.deviationFromTargetSeconds >= 0 ? "+" : "") + formatDuration(row.deviationFromTargetSeconds);
+              const abstandHint = row.deviationFromTargetSeconds == null
+                ? ""
+                : row.deviationFromTargetSeconds > 0
+                  ? ""
+                  : row.deviationFromTargetSeconds < 0
+                    ? ""
+                    : "";
+              const abstandColor = row.deviationFromTargetSeconds == null
+                ? ""
+                : row.deviationFromTargetSeconds < -15
+                  ? "color: var(--ok)"
+                  : row.deviationFromTargetSeconds > 15
+                    ? "color: var(--late)"
+                    : "color: var(--warn)";
+              const statusLabel = isGoal ? "GOAL" : "RACE";
+            if (row.isClosestToAverage) {
+              tr.style.outline = "2px solid var(--accent)";
+              tr.style.outlineOffset = "-2px";
+            }
+            if (row.participantId === lastAddedId) {
+              tr.style.background = "rgba(245, 158, 11, 0.15)";
+              tr.style.borderLeft = "4px solid var(--warn)";
+            }
+            tr.innerHTML = `
+              <td>${row.name}</td>
+              <td>${row.category}</td>
+                <td>${actualTimeText}</td>
+                <td>${sollTimeText}</td>
+                <td>${istDurationText}</td>
+                <td>${sollDurationText}</td>
+                <td style="${abstandColor}; font-weight: 600;">${abstandText}${abstandHint}</td>
+                <td class="tag ${row.timingStatus}">${statusLabel}</td>
+            `;
+            body.appendChild(tr);
+          }
+
+          statusEl.textContent = `Aktualisiert: ${formatClockTime(data.generatedAt)} (${data.count} Teilnehmer)`;
+        } catch (error) {
+          statusEl.textContent = error.message;
+        }
+      }
+
+      async function saveEvent() {
+        const typedName = document.getElementById("finishParticipantSearch").value.trim().toLowerCase();
+        if (!selectedFinishParticipant && typedName) {
+          const matches = overviewRowsCache.filter(
+            (row) => isRaceParticipant(row) && row.name.toLowerCase().includes(typedName)
+          );
+          if (matches.length === 1) {
+            selectedFinishParticipant = {
+              id: matches[0].participantId,
+              name: matches[0].name
+            };
+          }
+        }
+
+        if (!selectedFinishParticipant) {
+          document.getElementById("saveStatus").textContent = "Bitte Namen auswaehlen";
+          return;
+        }
+
+        const currentRow = overviewRowsCache.find((row) => row.participantId === selectedFinishParticipant.id);
+        if (!currentRow || !isRaceParticipant(currentRow)) {
+          document.getElementById("saveStatus").textContent = "Nur aktive RACE-Teilnehmer koennen erfasst werden.";
+          return;
+        }
+
+        const participantId = selectedFinishParticipant.id;
+        const erfasstVon = document.getElementById("recordedBy").value || "operator";
+        const statusEl = document.getElementById("saveStatus");
+
+        const payload = {
+          teilnehmerId: participantId,
+          eventTyp: "FINISH",
+          zeitstempel: new Date().toISOString(),
+          erfasstVon
+        };
+
+        try {
+          const res = await fetch(`${apiBase}/api/time-events`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || "Speichern fehlgeschlagen");
+
+          statusEl.textContent = `Gespeichert: Event ${data.id}`;
+          document.getElementById("finishParticipantSearch").value = "";
+          selectedFinishParticipant = null;
+          overviewRowsCache = overviewRowsCache.filter((row) => row.participantId !== participantId);
+          loadOverview();
+        } catch (error) {
+          statusEl.textContent = error.message;
+        }
+      }
+
+      document.getElementById("refreshOverview").addEventListener("click", loadOverview);
+      document.getElementById("saveEvent").addEventListener("click", saveEvent);
+
+      async function initPage() {
+        try {
+          await loadRaces();
+        } catch (error) {
+          document.getElementById("overviewStatus").textContent = error.message;
+        }
+      }
+
+      initPage();
+      updateLiveClock();
+      setInterval(updateLiveClock, 1000);
+      setInterval(loadOverview, 10000);
+    </script>
+  </body>
+</html>
+
+
+

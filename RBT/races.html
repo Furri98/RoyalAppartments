@@ -1,0 +1,666 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wettkaempfe</title>
+  <style>
+    * { box-sizing: border-box; }
+    :root {
+      --accent: #06b6d4; --accent-dark: #0891b2;
+      --ok: #22c55e; --warn: #f59e0b; --danger: #ef4444; --success: #10b981;
+      --bg: #0f172a; --panel: #111827; --panel-2: #1e293b;
+      --text: #e5e7eb; --muted: #94a3b8; --border: #334155;
+    }
+    body { margin: 0; padding: 20px; font-family: "Segoe UI", system-ui, sans-serif;
+      background: radial-gradient(circle at top, #1e293b, var(--bg) 60%);
+      color: var(--text); line-height: 1.5; min-height: 100vh; }
+    .wrap { max-width: 1200px; margin: 0 auto; }
+    .site-header { display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border);
+      gap: 12px; flex-wrap: wrap; }
+    .site-header h1 { margin: 0; font-size: 24px; font-weight: 700; }
+    .site-nav { display: flex; gap: 8px; flex-wrap: wrap; }
+    .site-nav a { background: var(--panel-2); color: var(--text); border: 1px solid var(--border);
+      padding: 7px 14px; border-radius: 8px; text-decoration: none;
+      font-size: 13px; font-weight: 600; transition: background 0.15s, border-color 0.15s; }
+    .site-nav a:hover, .site-nav a.active
+      { background: var(--accent); border-color: var(--accent); color: #001018; }
+    .card { background: linear-gradient(180deg, var(--panel), var(--panel-2));
+      border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+    .card h2 { margin: 0 0 14px; font-size: 16px; font-weight: 600; }
+    .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px; margin-bottom: 14px; }
+    label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 5px; color: var(--muted); }
+    input, select { width: 100%; padding: 9px 12px; border: 1px solid var(--border);
+      border-radius: 8px; background: #0b1220; color: var(--text); font-size: 14px; font-family: inherit; }
+    input:focus, select:focus { outline: none; border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(6,182,212,0.15); }
+    button { background: var(--accent); color: #001018; border: none; border-radius: 8px;
+      padding: 9px 16px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+    button:hover { background: var(--accent-dark); }
+    button.danger { background: var(--danger); color: white; }
+    button.danger:hover { background: #dc2626; }
+    button.secondary { background: var(--panel-2); color: var(--text); border: 1px solid var(--border); }
+    button.secondary:hover { background: var(--border); }
+    .action-btn { padding: 5px 10px; font-size: 12px; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+    th { color: var(--muted); font-weight: 600; font-size: 12px;
+      text-transform: uppercase; letter-spacing: 0.03em; }
+    tr:hover td { background: rgba(6,182,212,0.04); }
+    .status { font-size: 13px; margin-top: 10px; padding: 10px 14px; border-radius: 8px; }
+    .status.success { background: rgba(34,197,94,0.12); color: #86efac; }
+    .status.error { background: rgba(239,68,68,0.12); color: #fca5a5; }
+    .year-badge { background: var(--accent); color: #001018;
+      padding: 3px 9px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+    .sample { background: #0b1220; border: 1px dashed var(--border); border-radius: 8px; padding: 12px;
+      font-family: Consolas, monospace; font-size: 13px; overflow-x: auto; white-space: pre-wrap; }
+    .muted { color: var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="site-header">
+      <h1>Wettkaempfe</h1>
+      <nav class="site-nav">
+        <a href="/">Zeitnahme</a>
+        <a href="/dashboard.html">Dashboard</a>
+        <a href="/results.html">Ranglisten</a>
+        <a href="/categories.html">Kategorien</a>
+        <a href="/participants.html">Teilnehmer</a>
+      </nav>
+    </header>
+    <div class="card">
+      <h2>Aktueller Wettkampf (seitenuebergreifend)</h2>
+      <div class="row">
+        <div>
+          <label for="globalRaceSelector">Auswahl</label>
+          <select id="globalRaceSelector">
+            <option value="">-- Wettkampf waehlen --</option>
+          </select>
+        </div>
+      </div>
+      <div class="status" id="globalRaceStatus">Bitte Wettkampf waehlen.</div>
+    </div>
+    <div class="card">
+      <h2>Neuer Wettkampf</h2>
+      <div class="row">
+        <div>
+          <label for="raceName">Name</label>
+          <input id="raceName" type="text" placeholder="z.B. Sommerlauf 2026" />
+        </div>
+        <div>
+          <label for="raceStartTime">Startzeit (Europe/Berlin, YYYY-MM-DD HH:MM:SS)</label>
+          <input id="raceStartTime" type="text" placeholder="2026-06-29 14:05:09" />
+        </div>
+      </div>
+      <button id="saveNewRace" style="margin-top: 12px;">Wettkampf erstellen</button>
+      <div class="status" id="createRaceStatus"></div>
+    </div>
+
+    <!-- Inline Bearbeiten -->
+    <div class="card" id="editRaceCard" style="display:none; border: 2px solid var(--primary);">
+      <h2>Wettkampf bearbeiten</h2>
+      <div class="row">
+        <div>
+          <label for="editRaceName">Name</label>
+          <input id="editRaceName" type="text" />
+        </div>
+        <div>
+          <label for="editRaceStartTime">Startzeit (Europe/Berlin, YYYY-MM-DD HH:MM:SS)</label>
+          <input id="editRaceStartTime" type="text" placeholder="2026-06-29 14:05:09" />
+        </div>
+      </div>
+      <div style="display:flex; gap:8px; margin-top:12px;">
+        <button id="saveEditRace">Speichern</button>
+        <button id="cancelEditRace" style="background: var(--border); color: var(--text);">Abbrechen</button>
+      </div>
+      <div class="status" id="editRaceStatus"></div>
+    </div>
+
+    <!-- Wettkaempfe Liste -->
+    <div class="card">
+      <h2>Wettkaempfe</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Startzeit (Europe/Berlin)</th>
+            <th>Jahr</th>
+            <th>Erstellt</th>
+            <th>Aktionen</th>
+          </tr>
+        </thead>
+        <tbody id="racesTable">
+          <tr style="opacity: 0.5;">
+            <td colspan="5">Laden...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>Import alter Wettkampf</h2>
+      <div class="row">
+        <div>
+          <label for="legacyImportFile">CSV-Datei</label>
+          <input id="legacyImportFile" type="file" accept=".csv,text/csv" />
+        </div>
+        <div>
+          <label for="legacyImportDelimiter">Trennzeichen</label>
+          <select id="legacyImportDelimiter">
+            <option value=",">Komma</option>
+            <option value=";">Semikolon</option>
+            <option value="\t">Tab</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label for="legacyImportRace">Wettkampf</label>
+          <select id="legacyImportRace">
+            <option value="">-- Wettkampf waehlen --</option>
+          </select>
+        </div>
+        <div>
+          <label for="legacyImportAuthor">Erfasst von</label>
+          <input id="legacyImportAuthor" type="text" value="legacy-import" />
+        </div>
+      </div>
+      <div class="muted" style="margin-bottom: 10px;">
+        Erwartet: <strong>startnummer,name,geschlecht,kategorieNummer,verein,zielzeit</strong>. Zielzeit als <strong>HH:MM:SS</strong> oder <strong>YYYY-MM-DD HH:MM:SS</strong>.
+      </div>
+      <button id="previewLegacyImport">Vorschau pruefen</button>
+      <button id="runLegacyImport" style="margin-left: 8px;" disabled>Wettkampf importieren</button>
+      <div class="status" id="legacyImportStatus"></div>
+      <div class="sample" id="legacyImportPreview" style="margin-top: 12px;">Noch keine Datei geladen.</div>
+    </div>
+  </div>
+
+  <script>
+    const apiBase = "";
+    const SELECTED_RACE_KEY = "rbt.selectedRaceId";
+    let racesCache = [];
+    let legacyImportRows = [];
+
+    function getStoredRaceId() {
+      const raw = localStorage.getItem(SELECTED_RACE_KEY);
+      const parsed = Number(raw);
+      return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+    }
+
+    function storeRaceId(raceId) {
+      if (!raceId) {
+        localStorage.removeItem(SELECTED_RACE_KEY);
+        return;
+      }
+      localStorage.setItem(SELECTED_RACE_KEY, String(raceId));
+    }
+
+    function formatEuropeBerlinDateTime(value) {
+      if (!value) return "-";
+      // Normalize "YYYY-MM-DD HH:MM:SS" (space) to ISO "T" form before parsing
+      const iso = typeof value === "string" ? value.trim().replace(" ", "T") : value;
+      const dt = new Date(iso);
+      if (Number.isNaN(dt.getTime())) return "-";
+
+      const parts = new Intl.DateTimeFormat("sv-SE", {
+        timeZone: "Europe/Berlin",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false
+      }).formatToParts(dt);
+
+      const byType = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+      return `${byType.year}-${byType.month}-${byType.day} ${byType.hour}:${byType.minute}:${byType.second}`;
+    }
+
+    function formatEuropeBerlinDate(value) {
+      if (!value) return "-";
+      const iso = typeof value === "string" ? value.trim().replace(" ", "T") : value;
+      const dt = new Date(iso);
+      if (Number.isNaN(dt.getTime())) return "-";
+      const parts = new Intl.DateTimeFormat("sv-SE", {
+        timeZone: "Europe/Berlin",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+      }).formatToParts(dt);
+      const byType = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+      return `${byType.year}-${byType.month}-${byType.day}`;
+    }
+
+    function extractDatePart(value) {
+      if (!value) return null;
+      const text = String(value);
+      const match = text.match(/^(\d{4}-\d{2}-\d{2})/);
+      return match ? match[1] : null;
+    }
+
+    function parseLegacyTimeInput(value) {
+      const text = String(value || "").trim().replace("T", " ");
+      const fullMatch = text.match(/^(\d{4}-\d{2}-\d{2}) (\d{2}):(\d{2})(?::(\d{2}))?$/);
+      if (fullMatch) {
+        const [, datePart, hour, minute, secondRaw] = fullMatch;
+        return `${datePart} ${hour}:${minute}:${secondRaw ?? "00"}`;
+      }
+      const timeOnlyMatch = text.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
+      if (timeOnlyMatch) {
+        const [, hourRaw, minute, secondRaw] = timeOnlyMatch;
+        const hour = String(Number(hourRaw)).padStart(2, "0");
+        return `1970-01-01 ${hour}:${minute}:${secondRaw ?? "00"}`;
+      }
+      return null;
+    }
+
+    function parseCsv(text, delimiter) {
+      return text
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .map((line) => line.split(delimiter).map((value) => value.trim()));
+    }
+
+    function normalizeHeader(value) {
+      return value.toLowerCase().replace(/\s+/g, "");
+    }
+
+    function resolveLegacyRows(rows) {
+      if (rows.length === 0) return [];
+      const header = rows[0].map(normalizeHeader);
+      const hasHeader = header.includes("startnummer") || header.includes("name") || header.includes("kategorienummer") || header.includes("zielzeit");
+      const dataRows = hasHeader ? rows.slice(1) : rows;
+
+      return dataRows.map((row) => {
+        if (hasHeader) {
+          const record = {};
+          header.forEach((key, index) => {
+            record[key] = row[index] ?? "";
+          });
+          const timeValue = record.zielzeit ?? record.ankunftszeit ?? record.zeit ?? record.uhrzeit ?? record.ankunft ?? "";
+          const parsedTime = parseLegacyTimeInput(timeValue);
+          return {
+            startnummer: Number(record.startnummer),
+            name: record.name ?? "",
+            geschlecht: (record.geschlecht?.trim().toUpperCase() === "M" || record.geschlecht?.trim().toUpperCase() === "F" || record.geschlecht?.trim().toUpperCase() === "T")
+              ? record.geschlecht.trim().toUpperCase() : undefined,
+            kategorieNummer: Number(record.kategorienummer ?? record.kategorieid ?? record.kategorie ?? ""),
+            verein: record.verein?.trim() || undefined,
+            zielzeit: parsedTime,
+            rawTime: timeValue
+          };
+        }
+
+        const timePart = row[5] ?? row[1] ?? "";
+        const parsedTime = parseLegacyTimeInput(timePart);
+        return {
+          startnummer: Number(row[0]),
+          name: row[1] ?? "",
+          geschlecht: (row[2]?.trim().toUpperCase() === "M" || row[2]?.trim().toUpperCase() === "F" || row[2]?.trim().toUpperCase() === "T")
+            ? row[2].trim().toUpperCase() : undefined,
+          kategorieNummer: Number(row[3]),
+          verein: row[4]?.trim() || undefined,
+          zielzeit: parsedTime,
+          rawTime: timePart
+        };
+      });
+    }
+
+    function parseEuropeBerlinInput(value) {
+      const trimmed = String(value || "").trim();
+      const normalized = trimmed.replace("T", " ").replace(/\s+/, " ");
+      const match = normalized.match(/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2})(?::(\d{2}))?$/);
+      if (!match) return null;
+
+      const [, yearStr, monthStr, dayStr, hourStr, minuteStr, secondStrRaw] = match;
+      const secondStr = secondStrRaw ?? "00";
+      const year = Number(yearStr);
+      const month = Number(monthStr);
+      const day = Number(dayStr);
+      const hour = Number(hourStr);
+      const minute = Number(minuteStr);
+      const second = Number(secondStr);
+
+      if (
+        month < 1 || month > 12 ||
+        day < 1 || day > 31 ||
+        hour < 0 || hour > 23 ||
+        minute < 0 || minute > 59 ||
+        second < 0 || second > 59
+      ) {
+        return null;
+      }
+
+      const utcTimestamp = Date.UTC(year, month - 1, day, hour, minute, second);
+      const parsed = new Date(utcTimestamp);
+      if (
+        parsed.getUTCFullYear() !== year ||
+        parsed.getUTCMonth() !== month - 1 ||
+        parsed.getUTCDate() !== day
+      ) {
+        return null;
+      }
+
+      return `${yearStr}-${monthStr}-${dayStr} ${hourStr}:${minuteStr}:${secondStr}`;
+    }
+
+    function updateGlobalRaceSelector() {
+      const selector = document.getElementById("globalRaceSelector");
+      const legacySelector = document.getElementById("legacyImportRace");
+      const status = document.getElementById("globalRaceStatus");
+      selector.innerHTML = '<option value="">-- Wettkampf waehlen --</option>';
+      legacySelector.innerHTML = '<option value="">-- Wettkampf waehlen --</option>';
+
+      for (const race of racesCache) {
+        const option = document.createElement("option");
+        option.value = race.id;
+        const dateLabel = race.startzeit
+          ? formatEuropeBerlinDate(race.startzeit)
+          : (extractDatePart(race.datum) ?? "-");
+        option.textContent = `${race.name} (${dateLabel})`;
+        selector.appendChild(option);
+        legacySelector.appendChild(option.cloneNode(true));
+      }
+
+      const storedRaceId = getStoredRaceId();
+      const selectedRace = racesCache.find((race) => Number(race.id) === Number(storedRaceId));
+      if (selectedRace) {
+        selector.value = String(selectedRace.id);
+        legacySelector.value = String(selectedRace.id);
+        status.textContent = `Aktiv: ${selectedRace.name}`;
+      } else {
+        status.textContent = "Bitte Wettkampf waehlen.";
+      }
+    }
+
+    // Races laden
+    async function loadRaces() {
+      try {
+        const res = await fetch(`${apiBase}/api/races`);
+        if (!res.ok) throw new Error("Wettkaempfe konnten nicht geladen werden");
+        const data = await res.json();
+        racesCache = data;
+        renderRaces();
+        updateGlobalRaceSelector();
+      } catch (err) {
+        console.error("Fehler beim Laden der Wettkaempfe:", err);
+        document.getElementById("racesTable").innerHTML =
+          '<tr><td colspan="5" style="color: var(--danger);">Fehler beim Laden</td></tr>';
+      }
+    }
+
+    // Races rendern
+    function renderRaces() {
+      const tbody = document.getElementById("racesTable");
+      if (racesCache.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5">Keine Wettkaempfe vorhanden</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = racesCache
+        .map((race) => {
+          const fallbackDate = extractDatePart(race.datum);
+          const formattedStartTime = race.startzeit
+            ? formatEuropeBerlinDateTime(race.startzeit)
+            : (fallbackDate ? `${fallbackDate} 00:00:00` : "-");
+          const year = formattedStartTime === "-" ? "-" : formattedStartTime.slice(0, 4);
+          const createdDate = new Date(race.created_at).toLocaleDateString("de-DE");
+          const editStartRaw = race.startzeit
+            ? formatEuropeBerlinDateTime(race.startzeit)
+            : (fallbackDate ? `${fallbackDate} 00:00:00` : "");
+          
+          return `
+            <tr>
+              <td><strong>${race.name}</strong></td>
+              <td>${formattedStartTime}</td>
+              <td><span class="year-badge">${year}</span></td>
+              <td>${createdDate}</td>
+              <td>
+                <div class="actions">
+                  <button class="action-btn" onclick="editRace(${race.id}, '${race.name.replace(/'/g, "\\'")}', '${editStartRaw}')">Bearbeiten</button>
+                  <button class="action-btn danger" onclick="deleteRace(${race.id})">Loeschen</button>
+                </div>
+              </td>
+            </tr>
+          `;
+        })
+        .join("");
+    }
+
+    let editingRaceId = null;
+
+    function editRace(raceId, currentName, currentStartzeit) {
+      editingRaceId = raceId;
+      document.getElementById("editRaceName").value = currentName;
+      const currentStartText = currentStartzeit ? formatEuropeBerlinDateTime(currentStartzeit) : "";
+      document.getElementById("editRaceStartTime").value = currentStartText === "-" ? "" : currentStartText;
+      document.getElementById("editRaceStatus").textContent = "";
+      document.getElementById("editRaceStatus").className = "status";
+      const card = document.getElementById("editRaceCard");
+      card.style.display = "block";
+      card.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    document.getElementById("cancelEditRace").addEventListener("click", () => {
+      document.getElementById("editRaceCard").style.display = "none";
+      editingRaceId = null;
+    });
+
+    document.getElementById("saveEditRace").addEventListener("click", async () => {
+      if (!editingRaceId) return;
+      const statusEl = document.getElementById("editRaceStatus");
+      const newName = document.getElementById("editRaceName").value.trim();
+      const startzeitText = document.getElementById("editRaceStartTime").value;
+
+      if (!newName) {
+        statusEl.textContent = "Name fehlt";
+        statusEl.className = "status error";
+        return;
+      }
+
+      const parsedStartzeit = parseEuropeBerlinInput(startzeitText);
+      if (!parsedStartzeit) {
+        statusEl.textContent = "Format ungueltig. Bitte YYYY-MM-DD HH:MM:SS verwenden.";
+        statusEl.className = "status error";
+        return;
+      }
+
+      const derivedDatum = parsedStartzeit.slice(0, 10);
+
+      try {
+        const res = await fetch(`${apiBase}/api/races/${editingRaceId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: newName, datum: derivedDatum, startzeit: parsedStartzeit }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Speichern fehlgeschlagen");
+
+        statusEl.textContent = "Gespeichert!";
+        statusEl.className = "status success";
+        document.getElementById("editRaceCard").style.display = "none";
+        editingRaceId = null;
+        await loadRaces();
+      } catch (err) {
+        statusEl.textContent = `Fehler: ${err.message}`;
+        statusEl.className = "status error";
+      }
+    });
+
+    // Wettkampf loeschen
+    async function deleteRace(raceId) {
+      if (!confirm("Wirklich loeschen? Dies lscht auch alle zugehoerigen Kategorien und Teilnehmer.")) return;
+
+      try {
+        const res = await fetch(`${apiBase}/api/races/${raceId}`, {
+          method: "DELETE",
+        });
+
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.error || "Loeschen fehlgeschlagen");
+        }
+
+        loadRaces();
+        alert("Wettkampf gelscht!");
+      } catch (err) {
+        alert(`Fehler: ${err.message}`);
+      }
+    }
+
+    // Neuen Wettkampf speichern
+    document.getElementById("saveNewRace").addEventListener("click", async () => {
+      const name = document.getElementById("raceName").value.trim();
+      const startzeitText = document.getElementById("raceStartTime").value;
+      const statusEl = document.getElementById("createRaceStatus");
+
+      if (!name) {
+        statusEl.textContent = "Name fehlt";
+        statusEl.className = "status error";
+        return;
+      }
+
+      const startzeit = parseEuropeBerlinInput(startzeitText);
+      if (!startzeit) {
+        statusEl.textContent = "Startzeit fehlt oder Format ist ungueltig (Europe/Berlin, YYYY-MM-DD HH:MM:SS)";
+        statusEl.className = "status error";
+        return;
+      }
+
+      const derivedDatum = startzeit.slice(0, 10);
+
+      try {
+        const res = await fetch(`${apiBase}/api/races`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name,
+            datum: derivedDatum,
+            startzeit,
+          }),
+        });
+
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.error || "Speichern fehlgeschlagen");
+        }
+
+        statusEl.textContent = "Wettkampf erstellt!";
+        statusEl.className = "status success";
+        document.getElementById("raceName").value = "";
+        document.getElementById("raceStartTime").value = "";
+        loadRaces();
+      } catch (err) {
+        statusEl.textContent = `Fehler: ${err.message}`;
+        statusEl.className = "status error";
+      }
+    });
+
+    document.getElementById("globalRaceSelector").addEventListener("change", (event) => {
+      const selectedRaceId = Number(event.target.value) || null;
+      const status = document.getElementById("globalRaceStatus");
+      if (!selectedRaceId) {
+        storeRaceId(null);
+        status.textContent = "Bitte Wettkampf waehlen.";
+        return;
+      }
+
+      const selectedRace = racesCache.find((race) => Number(race.id) === selectedRaceId);
+      storeRaceId(selectedRaceId);
+      status.textContent = selectedRace ? `Aktiv: ${selectedRace.name}` : "Wettkampf geladen.";
+    });
+
+    // Initial laden
+    loadRaces();
+
+    document.getElementById("previewLegacyImport").addEventListener("click", async () => {
+      const file = document.getElementById("legacyImportFile").files?.[0];
+      const raceId = Number(document.getElementById("legacyImportRace").value) || null;
+      const statusEl = document.getElementById("legacyImportStatus");
+      const previewEl = document.getElementById("legacyImportPreview");
+      const importBtn = document.getElementById("runLegacyImport");
+
+      if (!raceId) {
+        statusEl.textContent = "Bitte zuerst einen Wettkampf waehlen.";
+        statusEl.className = "status error";
+        return;
+      }
+      if (!file) {
+        statusEl.textContent = "Bitte CSV-Datei auswaehlen.";
+        statusEl.className = "status error";
+        return;
+      }
+
+      const text = await file.text();
+      const delimiter = document.getElementById("legacyImportDelimiter").value;
+      const rows = parseCsv(text, delimiter);
+      legacyImportRows = resolveLegacyRows(rows).filter((row) => row.startnummer && row.name && row.kategorieNummer && row.zielzeit);
+
+      if (legacyImportRows.length === 0) {
+        statusEl.textContent = "Keine gueltigen Zeilen gefunden.";
+        statusEl.className = "status error";
+        previewEl.textContent = "Keine gueltigen Zeilen.";
+        importBtn.disabled = true;
+        return;
+      }
+
+      previewEl.textContent = legacyImportRows.slice(0, 10).map((row) => `${row.startnummer} | ${row.name} | ${row.geschlecht || "-"} | ${row.kategorieNummer} | ${row.verein || "-"} | ${row.zielzeit}`).join("\n");
+      statusEl.textContent = `${legacyImportRows.length} Zeilen erkannt.`;
+      statusEl.className = "status success";
+      importBtn.disabled = false;
+    });
+
+    document.getElementById("runLegacyImport").addEventListener("click", async () => {
+      const raceId = Number(document.getElementById("legacyImportRace").value) || null;
+      const statusEl = document.getElementById("legacyImportStatus");
+      if (!raceId) {
+        statusEl.textContent = "Bitte zuerst einen Wettkampf waehlen.";
+        statusEl.className = "status error";
+        return;
+      }
+      if (legacyImportRows.length === 0) {
+        statusEl.textContent = "Keine importierbaren Daten vorhanden.";
+        statusEl.className = "status error";
+        return;
+      }
+
+      try {
+        const res = await fetch(`${apiBase}/api/races/import-legacy`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            wettkampfId: raceId,
+            erfasstVon: document.getElementById("legacyImportAuthor").value.trim() || "legacy-import",
+            rows: legacyImportRows.map((row) => ({
+              startnummer: row.startnummer,
+              name: row.name,
+              geschlecht: row.geschlecht,
+              kategorieNummer: row.kategorieNummer,
+              verein: row.verein,
+              zielzeit: row.zielzeit,
+            }))
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Import fehlgeschlagen");
+
+        statusEl.textContent = `${data.importedResults} Resultate importiert, ${data.createdParticipants} Teilnehmer neu angelegt.`;
+        statusEl.className = "status success";
+      } catch (error) {
+        statusEl.textContent = error.message;
+        statusEl.className = "status error";
+      }
+    });
+  </script>
+</body>
+</html>
+
+
+

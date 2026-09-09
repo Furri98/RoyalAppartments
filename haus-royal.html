@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Haus Royal</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="menu-toggle" id="menuToggle">
+                    <svg class="hamburger" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                    <span class="menu-text">Menu</span>
+                </div>
+                <nav class="nav" id="mainNav">
+                    <ul class="nav-list">
+                        <li><a href="wohnung-mieten.html" class="nav-link">Wohnung mieten</a></li>
+                        <li><a href="haus-royal.html" class="nav-link">Haus Royal</a></li>
+                        <li><a href="wellness-entdecken.html" class="nav-link">Wellness entdecken</a></li>
+                        <li><a href="https://www.aletscharena.ch/" class="nav-link" target="_blank">Aletsch Arena entdecken</a></li>
+                        <li><a href="kontakt.html" class="nav-link">Kontakt</a></li>
+                        <li class="lang-toggle-nav-item">
+                            <div class="lang-toggle-module">
+                                <button class="lang-toggle" id="langToggle" aria-label="Sprache wechseln">
+                                    <span class="lang-toggle-option lang-toggle-de active">DE</span>
+                                    <span class="lang-toggle-slider"></span>
+                                    <span class="lang-toggle-option lang-toggle-en">EN</span>
+                                </button>
+                            </div>
+                        </li>
+                    </ul>
+                </nav>
+                <div class="logo">
+                    <a href="index.html"><img src="img/logo.png" alt="Logo" class="logo-image" /></a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+
+        <!-- Hero-Bereich mit Bild rechts oben, Titel und Lead links -->
+        <section class="royal-hero">
+            <div class="royal-hero-inner">
+                <div class="royal-hero-text">
+                    <h1>Haus Royal</h1>
+                    <p class="lead">Luxus und Eleganz in vollendeter Form</p>
+                </div>
+                <div class="royal-hero-img">
+                    <img src="https://dam.destination.one/3612172/c84855a6d643de5816fbf9522a41760a0e5d5acb97401ebcefb2c99f84dd005f/whatsapp-image-2025-11-20-at-23-10-50-2.jpg" alt="Haus Royal Keyvisual" class="royal-keyvisual-img" />
+                </div>
+            </div>
+        </section>
+        <!-- Workation Teaser -->
+        <section class="workation-teaser">
+            <div class="workation-teaser-inner">
+                <div class="workation-teaser-img">
+                    <img src="https://img.destination.one/remote/.webp?url=https%3A%2F%2Fdam.destination.one%2F3259667%2Fc5165e315ab1eae10e34b298be559ba5e6622b4ce607675e73230c94e26ded22%2Fco-working-space-royal-riederalp-im-sommer-in-der-aletsch-arena.jpg&scale=both&mode=crop&quality=90&width=2560&height=1878&focuspoint=0.08,-0.29" alt="Workation" />
+                </div>
+                <div class="workation-teaser-content">
+                    <h2 class="workation-title">Workation</h2>
+                    <p class="workation-lead">Arbeiten, wo andere Urlaub machen: Genieße produktive Tage mit inspirierendem Ausblick und perfekter Ausstattung.</p>
+                    <a href="https://www.aletscharena.ch/planen-buchen/erlebnisse/workation" class="btn btn-secondary" target="_blank" rel="noopener">Mehr erfahren</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Icon Teaser Facts -->
+        <section class="royal-facts">
+            <div class="icon-teasers-grid">
+                <div class="icon-teaser">
+                    <div class="icon-circle">
+                        <!-- Ski/Snowflake Icon for Skipiste -->
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 20l16-16" />
+                            <path d="M20 20l-8-8" />
+                            <circle cx="17" cy="7" r="2" />
+                        </svg>
+                    </div>
+                    <h4>Direkt an der Skipiste</h4>
+                </div>
+                <div class="icon-teaser">
+                    <div class="icon-circle">
+                        <!-- Car-free Icon -->
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="11" width="18" height="5" rx="2" />
+                            <circle cx="7.5" cy="16.5" r="1.5" />
+                            <circle cx="16.5" cy="16.5" r="1.5" />
+                            <line x1="3" y1="11" x2="21" y2="16" />
+                            <line x1="3" y1="16" x2="21" y2="11" />
+                        </svg>
+                    </div>
+                    <h4>Autofreie Riederalp</h4>
+                </div>
+                <div class="icon-teaser">
+                    <div class="icon-circle">
+                        <!-- Location/Pin Icon for Zentral gelegen -->
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 21c-4.418 0-8-5.373-8-10a8 8 0 1 1 16 0c0 4.627-3.582 10-8 10z" />
+                            <circle cx="12" cy="11" r="3" />
+                        </svg>
+                    </div>
+                    <h4>Zentral gelegen</h4>
+                </div>
+                <div class="icon-teaser">
+                    <div class="icon-circle">
+                        <!-- Golf Icon -->
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="18" cy="5" r="2" />
+                            <path d="M12 21V7l6-3v7" />
+                            <path d="M6 21h12" />
+                        </svg>
+                    </div>
+                    <h4>Neben dem Golfplatz</h4>
+                </div>
+            </div>
+        </section>
+
+
+        <section class="content-section">
+            <div class="container">
+                <h2>Standort</h2>
+                <div class="map-container">
+                    <iframe src="https://www.google.com/maps?q=Furrerstrasse+19,+3987+Riederalp,+Schweiz&output=embed" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div class="cta-floating">
+        <button class="btn btn-primary">Buchungsanfrage senden</button>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Chanti Webseite. Alle Rechte vorbehalten.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kontakt</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="menu-toggle" id="menuToggle">
+                    <svg class="hamburger" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                    <span class="menu-text">Menu</span>
+                </div>
+                <nav class="nav" id="mainNav">
+                    <ul class="nav-list">
+                        <li><a href="wohnung-mieten.html" class="nav-link">Wohnung mieten</a></li>
+                        <li><a href="haus-royal.html" class="nav-link">Haus Royal</a></li>
+                        <li><a href="wellness-entdecken.html" class="nav-link">Wellness entdecken</a></li>
+                        <li><a href="https://www.aletscharena.ch/" class="nav-link" target="_blank">Aletsch Arena entdecken</a></li>
+                        <li><a href="kontakt.html" class="nav-link">Kontakt</a></li>
+                        <li class="lang-toggle-nav-item">
+                            <div class="lang-toggle-module">
+                                <button class="lang-toggle" id="langToggle" aria-label="Sprache wechseln">
+                                    <span class="lang-toggle-option lang-toggle-de active">DE</span>
+                                    <span class="lang-toggle-slider"></span>
+                                    <span class="lang-toggle-option lang-toggle-en">EN</span>
+                                </button>
+                            </div>
+                        </li>
+                    </ul>
+                </nav>
+                <div class="logo">
+                    <a href="index.html"><img src="img/logo.png" alt="Logo" class="logo-image" /></a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="contact-people-section">
+            <div class="container">
+                <h1>Ihr Kontakt</h1>
+                <div class="contact-people-grid">
+                    <div class="contact-person">
+                        <img src="img/portrait-adi.jpg" alt="Adrian Furrer" class="contact-person-img" />
+                        <h2>Adrian Furrer</h2>
+                        <ul class="contact-details">
+                            <li><strong>Telefon:</strong> <a href="tel:+41799386431">+41 79 938 64 31</a></li>
+                            <li><strong>E-Mail:</strong> <a href="mailto:adrian@flug-taxi.ch">adrian@flug-taxi.ch</a></li>
+                        </ul>
+                    </div>
+                    <div class="contact-person">
+                        <img src="img/portrait-domi.jpeg" alt="Dominik Furrer" class="contact-person-img" />
+                        <h2>Dominik Furrer</h2>
+                        <ul class="contact-details">
+                            <li><strong>Telefon:</strong> <a href="tel:+41793502092">+41 79 350 20 92</a></li>
+                            <li><strong>E-Mail:</strong> <a href="mailto:dominik@flug-taxi.ch">dominik@flug-taxi.ch</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div class="cta-floating">
+        <button class="btn btn-primary">Buchungsanfrage senden</button>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Chanti Webseite. Alle Rechte vorbehalten.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

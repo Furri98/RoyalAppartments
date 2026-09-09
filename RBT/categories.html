@@ -1,0 +1,375 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kategorien</title>
+  <style>
+    * { box-sizing: border-box; }
+    :root {
+      --accent: #06b6d4; --accent-dark: #0891b2;
+      --ok: #22c55e; --warn: #f59e0b; --danger: #ef4444; --success: #10b981;
+      --bg: #0f172a; --panel: #111827; --panel-2: #1e293b;
+      --text: #e5e7eb; --muted: #94a3b8; --border: #334155;
+    }
+    body { margin: 0; padding: 20px; font-family: "Segoe UI", system-ui, sans-serif;
+      background: radial-gradient(circle at top, #1e293b, var(--bg) 60%);
+      color: var(--text); line-height: 1.5; min-height: 100vh; }
+    .wrap { max-width: 1200px; margin: 0 auto; }
+    .site-header { display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border);
+      gap: 12px; flex-wrap: wrap; }
+    .site-header h1 { margin: 0; font-size: 24px; font-weight: 700; }
+    .site-nav { display: flex; gap: 8px; flex-wrap: wrap; }
+    .site-nav a { background: var(--panel-2); color: var(--text); border: 1px solid var(--border);
+      padding: 7px 14px; border-radius: 8px; text-decoration: none;
+      font-size: 13px; font-weight: 600; transition: background 0.15s, border-color 0.15s; }
+    .site-nav a:hover, .site-nav a.active
+      { background: var(--accent); border-color: var(--accent); color: #001018; }
+    .card { background: linear-gradient(180deg, var(--panel), var(--panel-2));
+      border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+    .card h2 { margin: 0 0 14px; font-size: 16px; font-weight: 600; }
+    .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px; margin-bottom: 14px; }
+    label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 5px; color: var(--muted); }
+    input, select { width: 100%; padding: 9px 12px; border: 1px solid var(--border);
+      border-radius: 8px; background: #0b1220; color: var(--text); font-size: 14px; font-family: inherit; }
+    input:focus, select:focus { outline: none; border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(6,182,212,0.15); }
+    button { background: var(--accent); color: #001018; border: none; border-radius: 8px;
+      padding: 9px 16px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+    button:hover { background: var(--accent-dark); }
+    button.danger { background: var(--danger); color: white; }
+    button.danger:hover { background: #dc2626; }
+    button.success { background: var(--success); color: white; }
+    button.success:hover { background: #059669; }
+    button.secondary { background: var(--panel-2); color: var(--text); border: 1px solid var(--border); }
+    button.secondary:hover { background: var(--border); }
+    .action-btn { padding: 5px 10px; font-size: 12px; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+    th { color: var(--muted); font-weight: 600; font-size: 12px;
+      text-transform: uppercase; letter-spacing: 0.03em; }
+    tr:hover td { background: rgba(6,182,212,0.04); }
+    .status { font-size: 13px; margin-top: 10px; padding: 10px 14px; border-radius: 8px; }
+    .status.success { background: rgba(34,197,94,0.12); color: #86efac; }
+    .status.error { background: rgba(239,68,68,0.12); color: #fca5a5; }
+    .inline-edit { display: flex; gap: 8px; align-items: center; }
+    .inline-edit input { flex: 1; margin: 0; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="site-header">
+      <h1>Kategorien</h1>
+      <nav class="site-nav">
+        <a href="/">Zeitnahme</a>
+        <a href="/dashboard.html">Dashboard</a>
+        <a href="/results.html">Ranglisten</a>
+        <a href="/races.html">Wettkaempfe</a>
+        <a href="/categories.html" class="active">Kategorien</a>
+        <a href="/participants.html">Teilnehmer</a>
+      </nav>
+    </header>
+    <div class="card">
+      <label for="raceSelector" style="display: block; margin-bottom: 12px; font-weight: 600; font-size: 16px;">Wettkampf</label>
+      <select id="raceSelector" style="width: 100%; max-width: 400px; padding: 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--panel-1); color: var(--text);">
+        <option value="">-- Wettkampf waehlen --</option>
+      </select>
+    </div>
+
+    <!-- Kategorien erstellen -->
+    <div class="card" id="createCategoryCard" style="display: none;">
+      <h2>Neue Kategorie</h2>
+      <div class="row">
+        <div>
+          <label for="newCategoryName">Name</label>
+          <input id="newCategoryName" type="text" placeholder="z.B. Elite, U23, etc." />
+        </div>
+        <div>
+          <label for="newCategoryFactor">Faktor</label>
+          <input id="newCategoryFactor" type="number" step="any" min="0.000000000000001" value="1" />
+        </div>
+      </div>
+      <button id="saveNewCategory" style="margin-top: 12px;">Kategorie erstellen</button>
+      <div class="status" id="createCategoryStatus"></div>
+    </div>
+
+    <!-- Kategorien Liste -->
+    <div class="card" id="categoriesListCard" style="display: none;">
+      <h2>Kategorien</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Nr.</th>
+            <th>Name</th>
+            <th>Faktor</th>
+            <th>Status</th>
+            <th>Aktionen</th>
+          </tr>
+        </thead>
+        <tbody id="categoriesTable">
+          <tr style="opacity: 0.5;">
+            <td colspan="5">Laden...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const apiBase = "";
+    const SELECTED_RACE_KEY = "rbt.selectedRaceId";
+    let categoriesCache = [];
+    let racesCache = [];
+    let selectedRaceId = null;
+    let editingCategoryId = null;
+
+    function formatFactor(value) {
+      const numeric = Number(value);
+      if (!Number.isFinite(numeric)) return "";
+      return numeric.toLocaleString("en-US", {
+        useGrouping: false,
+        maximumFractionDigits: 15,
+      });
+    }
+
+    function getStoredRaceId() {
+      const raw = localStorage.getItem(SELECTED_RACE_KEY);
+      const parsed = Number(raw);
+      return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+    }
+
+    function storeRaceId(raceId) {
+      if (!raceId) {
+        localStorage.removeItem(SELECTED_RACE_KEY);
+        return;
+      }
+      localStorage.setItem(SELECTED_RACE_KEY, String(raceId));
+    }
+
+    // Load all races
+    async function loadRaces() {
+      try {
+        const res = await fetch(`${apiBase}/api/races`);
+        if (!res.ok) throw new Error("Wettkaempfe konnten nicht geladen werden");
+        racesCache = await res.json();
+        
+        const selector = document.getElementById("raceSelector");
+        selector.innerHTML = '<option value="">-- Wettkampf waehlen --</option>';
+        
+        for (const race of racesCache) {
+          const option = document.createElement("option");
+          option.value = race.id;
+          const date = new Date(race.datum).toLocaleDateString("de-DE");
+          option.textContent = `${race.name} (${date})`;
+          selector.appendChild(option);
+        }
+
+        const preferredRaceId = selectedRaceId ?? getStoredRaceId();
+        const preferredRace = racesCache.find((race) => Number(race.id) === Number(preferredRaceId));
+
+        if (preferredRace) {
+          selectedRaceId = Number(preferredRace.id);
+          selector.value = String(preferredRace.id);
+          storeRaceId(selectedRaceId);
+          await loadData();
+        } else if (racesCache.length > 0) {
+          selectedRaceId = Number(racesCache[0].id);
+          selector.value = String(selectedRaceId);
+          storeRaceId(selectedRaceId);
+          await loadData();
+        }
+      } catch (error) {
+        console.error("Error loading races:", error);
+      }
+    }
+
+    document.getElementById("raceSelector").addEventListener("change", (event) => {
+      selectedRaceId = Number(event.target.value) || null;
+      if (selectedRaceId) {
+        storeRaceId(selectedRaceId);
+        loadData();
+      } else {
+        storeRaceId(null);
+        // Hide cards when no race selected
+        document.getElementById("createCategoryCard").style.display = "none";
+        document.getElementById("categoriesListCard").style.display = "none";
+      }
+    });
+
+    async function loadData() {
+      document.getElementById("createCategoryCard").style.display = "block";
+      document.getElementById("categoriesListCard").style.display = "block";
+      await loadCategories();
+    }
+
+    // Kategorien laden
+    async function loadCategories() {
+      if (!selectedRaceId) return;
+      try {
+        const res = await fetch(`${apiBase}/api/categories`);
+        if (!res.ok) throw new Error("Kategorien konnten nicht geladen werden");
+        const data = await res.json();
+        // Filter by selected race
+        categoriesCache = data.filter((c) => Number(c.wettkampfId) === selectedRaceId);
+        renderCategories();
+      } catch (err) {
+        console.error("Fehler beim Laden der Kategorien:", err);
+        document.getElementById("categoriesTable").innerHTML =
+          '<tr><td colspan="5" style="color: var(--danger);">Fehler beim Laden</td></tr>';
+      }
+    }
+
+    // Kategorien rendern
+    function renderCategories() {
+      const tbody = document.getElementById("categoriesTable");
+      if (categoriesCache.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5">Keine Kategorien vorhanden</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = categoriesCache
+        .map(
+          (cat) => `
+        <tr>
+          <td>${cat.nummer}</td>
+          <td>${cat.name}</td>
+          <td>
+            ${editingCategoryId === Number(cat.id)
+              ? `<input id="factorEdit-${cat.id}" type="number" step="any" min="0.000000000000001" value="${formatFactor(cat.faktor)}" style="max-width:220px;" />`
+              : formatFactor(cat.faktor)}
+          </td>
+          <td>${cat.isActive ? "Aktiv" : "Inaktiv"}</td>
+          <td>
+            <div class="actions">
+              ${editingCategoryId === Number(cat.id)
+                ? `<button class="action-btn success" onclick="saveInlineCategory(${cat.id})">Speichern</button>
+                   <button class="action-btn" onclick="cancelInlineCategory()">Abbrechen</button>`
+                : `<button class="action-btn" onclick="startInlineCategoryEdit(${cat.id})">Bearbeiten</button>`}
+              <button class="action-btn danger" onclick="deleteCategory(${cat.id})">Loeschen</button>
+            </div>
+          </td>
+        </tr>
+      `
+        )
+        .join("");
+    }
+
+    function startInlineCategoryEdit(categoryId) {
+      editingCategoryId = Number(categoryId);
+      renderCategories();
+    }
+
+    function cancelInlineCategory() {
+      editingCategoryId = null;
+      renderCategories();
+    }
+
+    // Kategoriefaktor speichern
+    async function saveInlineCategory(categoryId) {
+      const cat = categoriesCache.find((c) => Number(c.id) === Number(categoryId));
+      if (!cat) return;
+
+      const input = document.getElementById(`factorEdit-${categoryId}`);
+      const parsedFactor = Number(input?.value);
+      if (!Number.isFinite(parsedFactor) || parsedFactor <= 0) {
+        alert("Bitte einen gueltigen Faktor > 0 eingeben.");
+        return;
+      }
+
+      try {
+        const res = await fetch(`${apiBase}/api/categories/${categoryId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            faktor: parsedFactor,
+          }),
+        });
+
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.error || "Speichern fehlgeschlagen");
+        }
+
+        editingCategoryId = null;
+        loadCategories();
+      } catch (err) {
+        alert(`Fehler: ${err.message}`);
+      }
+    }
+
+    // Kategorie loeschen
+    async function deleteCategory(categoryId) {
+      if (!confirm("Wirklich loeschen?")) return;
+
+      try {
+        const res = await fetch(`${apiBase}/api/categories/${categoryId}`, {
+          method: "DELETE",
+        });
+
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.error || "Loeschen fehlgeschlagen");
+        }
+
+        loadCategories();
+        alert("Kategorie gelscht!");
+      } catch (err) {
+        alert(`Fehler: ${err.message}`);
+      }
+    }
+
+    // Neue Kategorie speichern
+    document.getElementById("saveNewCategory").addEventListener("click", async () => {
+      if (!selectedRaceId) {
+        document.getElementById("createCategoryStatus").textContent = "Bitte Wettkampf waehlen";
+        document.getElementById("createCategoryStatus").className = "status error";
+        return;
+      }
+      const name = document.getElementById("newCategoryName").value.trim();
+      const factor = Number(document.getElementById("newCategoryFactor").value);
+      const statusEl = document.getElementById("createCategoryStatus");
+
+      if (!name) {
+        statusEl.textContent = "Name fehlt";
+        statusEl.className = "status error";
+        return;
+      }
+
+      try {
+        const res = await fetch(`${apiBase}/api/categories`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            wettkampfId: selectedRaceId,
+            name,
+            faktor: factor,
+          }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error || "Speichern fehlgeschlagen");
+        }
+
+        statusEl.textContent = `Kategorie erstellt. Nummer ${data.nummer}.`;
+        statusEl.className = "status success";
+        document.getElementById("newCategoryName").value = "";
+        document.getElementById("newCategoryFactor").value = "1";
+        loadCategories();
+      } catch (err) {
+        statusEl.textContent = `Fehler: ${err.message}`;
+        statusEl.className = "status error";
+      }
+    });
+
+    // Initial load
+    loadRaces();
+  </script>
+</body>
+</html>
+
+
+

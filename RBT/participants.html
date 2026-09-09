@@ -1,0 +1,568 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Teilnehmer</title>
+  <style>
+    * { box-sizing: border-box; }
+    :root {
+      --accent: #06b6d4; --accent-dark: #0891b2;
+      --ok: #22c55e; --warn: #f59e0b; --danger: #ef4444; --success: #10b981;
+      --bg: #0f172a; --panel: #111827; --panel-2: #1e293b;
+      --text: #e5e7eb; --muted: #94a3b8; --border: #334155;
+    }
+    body { margin: 0; padding: 20px; font-family: "Segoe UI", system-ui, sans-serif;
+      background: radial-gradient(circle at top, #1e293b, var(--bg) 60%);
+      color: var(--text); line-height: 1.5; min-height: 100vh; }
+    .wrap { max-width: 1200px; margin: 0 auto; }
+    .site-header { display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border);
+      gap: 12px; flex-wrap: wrap; }
+    .site-header h1 { margin: 0; font-size: 24px; font-weight: 700; }
+    .site-header .subtitle { color: var(--muted); font-size: 13px; margin-top: 2px; }
+    .site-nav { display: flex; gap: 8px; flex-wrap: wrap; }
+    .site-nav a { background: var(--panel-2); color: var(--text); border: 1px solid var(--border);
+      padding: 7px 14px; border-radius: 8px; text-decoration: none;
+      font-size: 13px; font-weight: 600; transition: background 0.15s, border-color 0.15s; }
+    .site-nav a:hover, .site-nav a.active
+      { background: var(--accent); border-color: var(--accent); color: #001018; }
+    .card { background: linear-gradient(180deg, var(--panel), var(--panel-2));
+      border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+    .card h2 { margin: 0 0 14px; font-size: 16px; font-weight: 600; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
+    .two { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 18px; }
+    @media (max-width: 900px) { .two { grid-template-columns: 1fr; } }
+    label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 5px; color: var(--muted); }
+    input, select, textarea { width: 100%; padding: 9px 12px; border: 1px solid var(--border);
+      border-radius: 8px; background: #0b1220; color: var(--text); font-size: 14px; font-family: inherit; }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(6,182,212,0.15); }
+    textarea { min-height: 200px; resize: vertical; font-family: Consolas, monospace; }
+    button { background: var(--accent); color: #001018; border: none; border-radius: 8px;
+      padding: 9px 16px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+    button:hover { background: var(--accent-dark); }
+    button.danger { background: var(--danger); color: white; }
+    button.danger:hover { background: #dc2626; }
+    button.secondary { background: var(--panel-2); color: var(--text); border: 1px solid var(--border); }
+    button.secondary:hover { background: var(--border); }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); font-size: 13px; }
+    th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.03em; }
+    tr:hover td { background: rgba(6,182,212,0.04); }
+    .status { font-size: 13px; margin-top: 10px; padding: 10px 14px; border-radius: 8px; }
+    .status.error { background: rgba(239,68,68,0.12); color: #fca5a5; }
+    .status.success { background: rgba(34,197,94,0.12); color: #86efac; }
+    .muted { color: var(--muted); }
+    .sample { background: #0b1220; border: 1px dashed var(--border); border-radius: 8px; padding: 12px;
+      font-family: Consolas, monospace; font-size: 13px; overflow-x: auto; }
+    .btn-small { padding: 4px 10px; font-size: 12px; border-radius: 6px; font-weight: 600;
+      background: var(--accent); color: #001018; border: 0; cursor: pointer; }
+    .btn-small:hover { background: var(--accent-dark); }
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+      z-index: 100; align-items: center; justify-content: center; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--panel-2); border: 1px solid var(--border); border-radius: 12px;
+      padding: 24px; min-width: 320px; max-width: 90vw; }
+    .modal h3 { margin: 0 0 16px; }
+    .modal-actions { display: flex; gap: 10px; margin-top: 16px; justify-content: flex-end; }
+    .btn-cancel { background: var(--border); color: var(--text); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="site-header">
+      <div>
+        <h1>Teilnehmer</h1>
+        <div class="subtitle">Erfassung und CSV-Import</div>
+      </div>
+      <nav class="site-nav">
+        <a href="/">Zeitnahme</a>
+        <a href="/dashboard.html">Dashboard</a>
+        <a href="/results.html">Ranglisten</a>
+        <a href="/races.html">Wettkaempfe</a>
+        <a href="/categories.html">Kategorien</a>
+        <a href="/participants.html" class="active">Teilnehmer</a>
+      </nav>
+    </header>
+
+    <div class="card">
+      <label for="raceSelector">Aktueller Wettkampf</label>
+      <select id="raceSelector">
+        <option value="">-- Wettkampf waehlen --</option>
+      </select>
+      <div class="status" id="raceStatus">Bitte Wettkampf waehlen.</div>
+    </div>
+
+    <div class="two">
+      <div class="card">
+        <h2>CSV-Import</h2>
+        <div class="muted" style="margin-bottom: 10px;">
+          Format: <strong>startnummer,name,geschlecht,kategorieNummer,verein</strong>. Erste Zeile darf Kopfzeile sein. Geschlecht: M, F oder T (optional).
+        </div>
+        <div class="grid">
+          <div>
+            <label for="csvFile">CSV-Datei</label>
+            <input id="csvFile" type="file" accept=".csv,text/csv" />
+          </div>
+          <div>
+            <label for="csvDelimiter">Trennzeichen</label>
+            <select id="csvDelimiter">
+              <option value=",">Komma</option>
+              <option value=";">Semikolon</option>
+              <option value="\t">Tab</option>
+            </select>
+          </div>
+        </div>
+        <button id="parseCsv" style="margin-top: 14px;">CSV pruefen</button>
+        <div class="status" id="csvStatus"></div>
+      </div>
+
+      <div class="card">
+        <h2>Einzelerfassung</h2>
+        <div class="grid">
+          <div>
+            <label for="name">Name</label>
+            <input id="name" type="text" />
+          </div>
+          <div>
+            <label for="kategorieId">Kategorie-Nr.</label>
+            <select id="kategorieId">
+              <option value="">-- Kategorie waehlen --</option>
+            </select>
+          </div>
+          <div>
+            <label for="verein">Verein</label>
+            <input id="verein" type="text" />
+          </div>
+          <div>
+            <label for="geschlecht">Geschlecht</label>
+            <select id="geschlecht">
+              <option value="">-- optional --</option>
+              <option value="M">M&auml;nnlich (M)</option>
+              <option value="F">Weiblich (F)</option>
+              <option value="T">Tandem (T)</option>
+            </select>
+          </div>
+        <button id="saveSingle" style="margin-top: 14px;">Teilnehmer speichern</button>
+        <div class="status" id="singleStatus"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Vorschau</h2>
+      <div class="sample" id="preview">Noch keine CSV geladen.</div>
+      <button id="importCsv" style="margin-top: 14px;" disabled>Import starten</button>
+      <div class="status" id="importStatus"></div>
+    </div>
+
+    <div class="card">
+      <h2>Bereits erfasste Teilnehmer</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Startnummer</th>
+            <th>Name</th>
+            <th>Geschlecht</th>
+            <th>Kategorie</th>
+            <th>Verein</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="participantsBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal: Teilnehmer bearbeiten -->
+  <div class="modal-overlay" id="categoryModal">
+    <div class="modal">
+      <h3 id="modalTitle">Teilnehmer bearbeiten</h3>
+      <label for="modalKategorie" style="margin-top:10px;">Kategorie</label>
+      <select id="modalKategorie" style="margin-top: 6px;"></select>
+      <label for="modalGeschlecht" style="margin-top:12px;">Geschlecht</label>
+      <select id="modalGeschlecht" style="margin-top: 6px;">
+        <option value="">-- optional --</option>
+        <option value="M">M&auml;nnlich (M)</option>
+        <option value="F">Weiblich (F)</option>
+        <option value="T">Tandem (T)</option>
+      </select>
+      <div class="status" id="modalStatus"></div>
+      <div class="modal-actions">
+        <button class="btn-small danger" id="modalDelete"">L&ouml;schen</button>
+        <button class="btn-small btn-cancel" id="modalCancel">Abbrechen</button>
+        <button class="btn-small" id="modalSave">Speichern</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const apiBase = "";
+    const SELECTED_RACE_KEY = "rbt.selectedRaceId";
+    let selectedRaceId = null;
+    let racesCache = [];
+    let participantsCache = [];
+    let categoriesCache = [];
+    let parsedCsvRows = [];
+
+    function getStoredRaceId() {
+      const raw = localStorage.getItem(SELECTED_RACE_KEY);
+      const parsed = Number(raw);
+      return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+    }
+
+    function storeRaceId(raceId) {
+      if (!raceId) {
+        localStorage.removeItem(SELECTED_RACE_KEY);
+        return;
+      }
+      localStorage.setItem(SELECTED_RACE_KEY, String(raceId));
+    }
+
+    function parseCsv(text, delimiter) {
+      return text
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .map((line) => line.split(delimiter).map((value) => value.trim()));
+    }
+
+    function normalizeHeader(value) {
+      return value.toLowerCase().replace(/\s+/g, "");
+    }
+
+    function resolveCsvRows(rows) {
+      if (rows.length === 0) return [];
+      const header = rows[0].map(normalizeHeader);
+      const hasHeader =
+        header.includes("startnummer") ||
+        header.includes("name") ||
+        header.includes("kategorieid") ||
+        header.includes("kategorienummer") ||
+        header.includes("kategorie");
+      const dataRows = hasHeader ? rows.slice(1) : rows;
+
+      return dataRows.map((row) => {
+        if (hasHeader) {
+          const record = {};
+          header.forEach((key, index) => {
+            record[key] = row[index] ?? "";
+          });
+          const categoryValue = record.kategorienummer ?? record.kategorieid ?? record.kategorie ?? "";
+          return {
+            startnummer: Number(record.startnummer),
+            name: record.name ?? "",
+            kategorieId: Number(categoryValue),
+            verein: record.verein?.trim() || undefined,
+            geschlecht: (record.geschlecht?.trim().toUpperCase() === "M" || record.geschlecht?.trim().toUpperCase() === "F" || record.geschlecht?.trim().toUpperCase() === "T")
+              ? record.geschlecht.trim().toUpperCase() : undefined
+          };
+        }
+
+        return {
+          startnummer: Number(row[0]),
+          name: row[1] ?? "",
+          geschlecht: (row[2]?.trim().toUpperCase() === "M" || row[2]?.trim().toUpperCase() === "F" || row[2]?.trim().toUpperCase() === "T")
+            ? row[2].trim().toUpperCase() : undefined,
+          kategorieId: Number(row[3]),
+          verein: row[4]?.trim() || undefined
+        };
+      });
+    }
+
+    async function loadRaces() {
+      const res = await fetch(`${apiBase}/api/races`);
+      if (!res.ok) throw new Error("Wettkaempfe konnten nicht geladen werden");
+      racesCache = await res.json();
+
+      const selector = document.getElementById("raceSelector");
+      selector.innerHTML = '<option value="">-- Wettkampf waehlen --</option>';
+      for (const race of racesCache) {
+        const option = document.createElement("option");
+        option.value = race.id;
+        option.textContent = `${race.name} (${new Date(race.datum).toLocaleDateString("de-DE")})`;
+        selector.appendChild(option);
+      }
+
+      const preferredRaceId = selectedRaceId ?? getStoredRaceId();
+      const preferredRace = racesCache.find((race) => Number(race.id) === Number(preferredRaceId));
+
+      if (preferredRace) {
+        selectedRaceId = Number(preferredRace.id);
+        selector.value = String(preferredRace.id);
+        storeRaceId(selectedRaceId);
+      } else if (racesCache.length > 0) {
+        selectedRaceId = Number(racesCache[0].id);
+        selector.value = String(selectedRaceId);
+        storeRaceId(selectedRaceId);
+      }
+
+      document.getElementById("raceStatus").textContent = selectedRaceId ? "Wettkampf geladen." : "Bitte Wettkampf waehlen.";
+    }
+
+    async function loadCategories() {
+      if (!selectedRaceId) return;
+      const res = await fetch(`${apiBase}/api/categories`);
+      if (!res.ok) throw new Error("Kategorien konnten nicht geladen werden");
+      categoriesCache = (await res.json()).filter((category) => Number(category.wettkampfId) === selectedRaceId);
+
+      const categorySelector = document.getElementById("kategorieId");
+      categorySelector.innerHTML = '<option value="">-- Kategorie waehlen --</option>';
+      for (const category of categoriesCache) {
+        const option = document.createElement("option");
+        option.value = String(category.nummer);
+        option.textContent = `${category.nummer} - ${category.name}`;
+        categorySelector.appendChild(option);
+      }
+    }
+
+    async function loadParticipants() {
+      if (!selectedRaceId) return;
+      const res = await fetch(`${apiBase}/api/participants`);
+      if (!res.ok) throw new Error("Teilnehmer konnten nicht geladen werden");
+      participantsCache = (await res.json()).filter((participant) => Number(participant.wettkampfId) === selectedRaceId);
+
+      const categoryMap = new Map(
+        categoriesCache.map((category) => [String(category.nummer), `${category.nummer} - ${category.name}`])
+      );
+      const body = document.getElementById("participantsBody");
+      body.innerHTML = participantsCache.map((participant) => `
+        <tr>
+          <td>${participant.startnummer}</td>
+          <td>${participant.name}</td>
+          <td>${participant.geschlecht === 'M' ? '\u2642 M' : participant.geschlecht === 'F' ? '\u2640 F' : participant.geschlecht === 'T' ? '\uD83D\uDC65 T' : '-'}</td>
+          <td>${categoryMap.get(String(participant.kategorieId)) ?? participant.kategorieId}</td>
+          <td>${participant.verein ?? "-"}</td>
+          <td>${participant.status}</td>
+          <td><button class="btn-small" onclick="openEditModal(${participant.id}, ${participant.kategorieId}, '${participant.geschlecht ?? ''}')">&#9881; Bearbeiten</button></td>
+        </tr>
+      `).join("");
+    }
+
+    async function refreshData() {
+      if (!selectedRaceId) return;
+      await loadCategories();
+      await loadParticipants();
+    }
+
+    document.getElementById("raceSelector").addEventListener("change", async (event) => {
+      selectedRaceId = Number(event.target.value) || null;
+      if (!selectedRaceId) {
+        storeRaceId(null);
+        document.getElementById("raceStatus").textContent = "Bitte Wettkampf waehlen.";
+        return;
+      }
+      storeRaceId(selectedRaceId);
+      document.getElementById("raceStatus").textContent = "Wettkampf geladen.";
+      await refreshData();
+    });
+
+    document.getElementById("parseCsv").addEventListener("click", async () => {
+      const fileInput = document.getElementById("csvFile");
+      const statusEl = document.getElementById("csvStatus");
+      const previewEl = document.getElementById("preview");
+      const importBtn = document.getElementById("importCsv");
+      const file = fileInput.files?.[0];
+
+      if (!selectedRaceId) {
+        statusEl.textContent = "Bitte zuerst einen Wettkampf waehlen.";
+        statusEl.className = "status error";
+        return;
+      }
+      if (!file) {
+        statusEl.textContent = "Bitte CSV-Datei auswaehlen.";
+        statusEl.className = "status error";
+        return;
+      }
+
+      const text = await file.text();
+      const delimiter = document.getElementById("csvDelimiter").value;
+      const rows = parseCsv(text, delimiter);
+      parsedCsvRows = resolveCsvRows(rows).filter((row) => row.name && row.startnummer && row.kategorieId);
+
+      if (parsedCsvRows.length === 0) {
+        statusEl.textContent = "Keine gueltigen Zeilen gefunden.";
+        statusEl.className = "status error";
+        previewEl.textContent = "Keine gueltigen Zeilen.";
+        importBtn.disabled = true;
+        return;
+      }
+
+      previewEl.textContent = parsedCsvRows.slice(0, 10).map((row) => `${row.startnummer} | ${row.name} | ${row.geschlecht || "-"} | Kat. ${row.kategorieId} | ${row.verein || "-"}`).join("\n");
+      statusEl.textContent = `${parsedCsvRows.length} Zeilen erkannt.`;
+      statusEl.className = "status success";
+      importBtn.disabled = false;
+    });
+
+    document.getElementById("importCsv").addEventListener("click", async () => {
+      const statusEl = document.getElementById("importStatus");
+      if (!selectedRaceId) {
+        statusEl.textContent = "Bitte zuerst einen Wettkampf waehlen.";
+        statusEl.className = "status error";
+        return;
+      }
+      if (parsedCsvRows.length === 0) {
+        statusEl.textContent = "Keine CSV-Daten vorhanden.";
+        statusEl.className = "status error";
+        return;
+      }
+
+      try {
+        const res = await fetch(`${apiBase}/api/participants/bulk`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            wettkampfId: selectedRaceId,
+            participants: parsedCsvRows
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          const detail = data.details
+            ? JSON.stringify(data.details.fieldErrors ?? data.details)
+            : "";
+          throw new Error((data.error || "Import fehlgeschlagen") + (detail ? `: ${detail}` : ""));
+        }
+
+        statusEl.textContent = `${data.count} Teilnehmer importiert.`;
+        statusEl.className = "status success";
+        await refreshData();
+      } catch (error) {
+        statusEl.textContent = error.message;
+        statusEl.className = "status error";
+      }
+    });
+
+    document.getElementById("saveSingle").addEventListener("click", async () => {
+      if (!selectedRaceId) {
+        document.getElementById("singleStatus").textContent = "Bitte zuerst einen Wettkampf waehlen.";
+        return;
+      }
+
+      const selectedCategoryId = Number(document.getElementById("kategorieId").value);
+      if (!selectedCategoryId) {
+        document.getElementById("singleStatus").textContent = "Bitte eine Kategorie waehlen.";
+        document.getElementById("singleStatus").className = "status error";
+        return;
+      }
+
+      const payload = {
+        wettkampfId: selectedRaceId,
+        name: document.getElementById("name").value.trim(),
+        kategorieId: selectedCategoryId,
+        verein: document.getElementById("verein").value.trim() || undefined,
+        geschlecht: document.getElementById("geschlecht").value || undefined
+      };
+
+      try {
+        const res = await fetch(`${apiBase}/api/participants`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Speichern fehlgeschlagen");
+
+        document.getElementById("singleStatus").textContent = `Teilnehmer gespeichert: ${data.id} (Startnummer ${data.startnummer})`;
+        document.getElementById("singleStatus").className = "status success";
+        document.getElementById("name").value = "";
+        document.getElementById("kategorieId").value = "";
+        document.getElementById("verein").value = "";
+        document.getElementById("geschlecht").value = "";
+        await refreshData();
+      } catch (error) {
+        document.getElementById("singleStatus").textContent = error.message;
+        document.getElementById("singleStatus").className = "status error";
+      }
+    });
+
+    let modalParticipantId = null;
+
+    function openEditModal(participantId, currentKategorieId, currentGeschlecht) {
+      modalParticipantId = participantId;
+      const select = document.getElementById("modalKategorie");
+      select.innerHTML = "";
+      for (const category of categoriesCache) {
+        const option = document.createElement("option");
+        option.value = String(category.nummer);
+        option.textContent = `${category.nummer} - ${category.name}`;
+        if (String(category.nummer) === String(currentKategorieId)) option.selected = true;
+        select.appendChild(option);
+      }
+      document.getElementById("modalGeschlecht").value = currentGeschlecht ?? "";
+      document.getElementById("modalStatus").textContent = "";
+      document.getElementById("modalStatus").className = "status";
+      document.getElementById("categoryModal").classList.add("open");
+    }
+
+    // keep old name as alias for compatibility
+    function openCategoryModal(participantId, currentKategorieId) {
+      openEditModal(participantId, currentKategorieId, "");
+    }
+
+    document.getElementById("modalCancel").addEventListener("click", () => {
+      document.getElementById("categoryModal").classList.remove("open");
+    });
+
+    document.getElementById("modalSave").addEventListener("click", async () => {
+      const statusEl = document.getElementById("modalStatus");
+      const newKategorieId = Number(document.getElementById("modalKategorie").value);
+      const newGeschlecht = document.getElementById("modalGeschlecht").value || null;
+      if (!newKategorieId || !modalParticipantId) return;
+      try {
+        const res = await fetch(`${apiBase}/api/participants/${modalParticipantId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ kategorieId: newKategorieId, geschlecht: newGeschlecht })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Speichern fehlgeschlagen");
+        statusEl.textContent = "Gespeichert.";
+        statusEl.className = "status success";
+        await refreshData();
+        setTimeout(() => document.getElementById("categoryModal").classList.remove("open"), 800);
+      } catch (error) {
+        statusEl.textContent = error.message;
+        statusEl.className = "status error";
+      }
+    });
+
+    document.getElementById("modalDelete").addEventListener("click", async () => {
+      if (!modalParticipantId) return;
+      const p = participantsCache.find(x => Number(x.id) === Number(modalParticipantId));
+      if (!confirm(`Teilnehmer "${p?.name ?? modalParticipantId}" wirklich l\u00f6schen?`)) return;
+      const statusEl = document.getElementById("modalStatus");
+      try {
+        const res = await fetch(`${apiBase}/api/participants/${modalParticipantId}`, { method: "DELETE" });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "L\u00f6schen fehlgeschlagen");
+        document.getElementById("categoryModal").classList.remove("open");
+        await refreshData();
+      } catch (error) {
+        statusEl.textContent = error.message;
+        statusEl.className = "status error";
+      }
+    });
+
+    document.getElementById("categoryModal").addEventListener("click", (e) => {
+      if (e.target === document.getElementById("categoryModal")) {
+        document.getElementById("categoryModal").classList.remove("open");
+      }
+    });
+
+    (async function init() {
+      try {
+        await loadRaces();
+        await refreshData();
+      } catch (error) {
+        document.getElementById("raceStatus").textContent = error.message;
+        document.getElementById("raceStatus").className = "status error";
+      }
+    })();
+  </script>
+</body>
+</html>
+
+
+
